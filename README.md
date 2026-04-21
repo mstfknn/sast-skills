@@ -34,8 +34,8 @@ Claude Code with Opus model is recommended. But if the cost is a concern, use an
 | sast-pathtraversal | Path / directory traversal |
 | sast-fileupload | Insecure file upload |
 | sast-businesslogic | Business logic flaws (price manipulation, workflow bypass, race conditions, etc.) |
+| sast-hardcodedsecrets | Hardcoded API keys, tokens, and credentials in client-facing code |
 | sast-report | Consolidated final report ranked by severity |
-
 
 ## Installation
 
@@ -62,7 +62,6 @@ Other commands:
 | `npx sast-skills --version` | Print the installed version |
 
 > **Note:** If your project already contains a `CLAUDE.md` or `AGENTS.md` file, either pass `--force` to overwrite it or back it up first — the installer will refuse to clobber it by default.
-
 
 ## Usage
 

@@ -39,13 +39,18 @@
   },
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sync": "node scripts/sync-skills.js sast-files/.claude/skills sast-files/.agents/skills",
+    "new-skill": "node scripts/scaffold-skill.js",
+    "lint:md": "markdownlint-cli2",
+    "prepublishOnly": "npm run sync && npm test"
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0"
   },
   "devDependencies": {
-    "vitest": "^4.1.0",
-    "tdd-guard-vitest": "^0.2.0"
+    "markdownlint-cli2": "^0.22.0",
+    "tdd-guard-vitest": "^0.2.0",
+    "vitest": "^4.1.0"
   }
 }
