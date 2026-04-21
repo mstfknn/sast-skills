@@ -16,6 +16,25 @@ yarn-error.log*
 .env.*
 !.env.example
 
+# Credentials / keys — NEVER commit
+.npmrc
+.yarnrc
+.pypirc
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+
+# Build artefacts
+dist/
+build/
+out/
+*.tsbuildinfo
+
 # Editor / IDE caches
 .vscode/
 .idea/
@@ -23,13 +42,40 @@ yarn-error.log*
 *.swo
 *~
 
-# Test & tooling caches
+# Linter / test / tool caches
 coverage/
 .nyc_output/
 *.lcov
 .vite/
 .vitest-cache/
 .cache/
+.eslintcache
+.stylelintcache
+
+# Yarn PnP / Yarn Berry
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# Husky internals
+.husky/_/
+
+# Python tooling (used by ad-hoc scripts)
+__pycache__/
+*.pyc
+*.pyo
+
+# Ad-hoc artefacts that shouldn't land in the repo
+*.log
+*.bak
+*.orig
+*.tmp
+tmp/
+temp/
 
 # TDD Guard local state (per-machine, ephemeral)
 /.claude/
