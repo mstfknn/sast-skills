@@ -13,7 +13,7 @@ if (command === '--version') {
   console.log(pkg.version);
 } else if (command === undefined) {
   console.log('Usage: sast-skills <command>\n\nCommands:\n  install    Install SAST skills');
-} else if (command === 'install') {
+} else if (command === 'install' || command === 'uninstall' || command === 'update' || command === 'doctor') {
   await run({
     argv: [command, ...rest],
     cwd: process.cwd(),
