@@ -6,8 +6,11 @@ const ASSISTANT_LAYOUT = {
   agents: { entryFile: 'AGENTS.md', skillsDir: '.agents' },
 };
 
+const VALID_ASSISTANTS = [...Object.keys(ASSISTANT_LAYOUT), 'all'];
+const VALID_SCOPES = ['project', 'global'];
+
 function assistantsFor(choice) {
-  if (choice === 'all') return ['claude', 'agents'];
+  if (choice === 'all') return Object.keys(ASSISTANT_LAYOUT);
   return [choice];
 }
 
@@ -20,18 +23,43 @@ async function exists(path) {
   }
 }
 
-export async function install({ packageRoot, argv, cwd, stdout }) {
+export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt }) {
   let target = cwd;
   let dryRun = false;
   let force = false;
-  let assistant = 'claude';
-  let scope = 'project';
+  let yes = false;
+  let assistant;
+  let scope;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--target') target = argv[++i];
     else if (argv[i] === '--dry-run') dryRun = true;
     else if (argv[i] === '--force') force = true;
+    else if (argv[i] === '--yes') yes = true;
     else if (argv[i] === '--assistant') assistant = argv[++i];
     else if (argv[i] === '--scope') scope = argv[++i];
+  }
+
+  if (!yes && !isTTY) {
+    throw new Error('Non-interactive stdin detected; pass --yes to run without prompts, or run in an interactive TTY.');
+  }
+
+  if (!yes && isTTY) {
+    if (assistant === undefined) {
+      assistant = await prompt({ name: 'assistant', choices: VALID_ASSISTANTS });
+    }
+    if (scope === undefined) {
+      scope = await prompt({ name: 'scope', choices: VALID_SCOPES });
+    }
+  }
+
+  assistant ??= 'claude';
+  scope ??= 'project';
+
+  if (!VALID_ASSISTANTS.includes(assistant)) {
+    throw new Error(`Invalid --assistant value: ${assistant}. Expected one of: ${VALID_ASSISTANTS.join(', ')}.`);
+  }
+  if (!VALID_SCOPES.includes(scope)) {
+    throw new Error(`Invalid --scope value: ${scope}. Expected one of: ${VALID_SCOPES.join(', ')}.`);
   }
 
   const srcRoot = resolve(packageRoot, 'sast-files');
