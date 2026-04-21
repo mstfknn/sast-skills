@@ -24,7 +24,7 @@ if (command === '--version') {
     'Flags:',
     '  --version    Print the installed version',
   ].join('\n'));
-} else if (command === 'install' || command === 'uninstall' || command === 'update' || command === 'doctor') {
+} else if (command === 'install' || command === 'uninstall' || command === 'update' || command === 'doctor' || command === 'export') {
   await run({
     argv: [command, ...rest],
     cwd: process.cwd(),

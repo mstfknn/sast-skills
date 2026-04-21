@@ -1,6 +1,7 @@
 import { install } from './commands/install.js';
 import { uninstall } from './commands/uninstall.js';
 import { doctor } from './commands/doctor.js';
+import { exportCmd } from './commands/export.js';
 import { clackPrompt } from './prompts/clack.js';
 
 export async function run({ argv, cwd, packageRoot, stdin, stdout }) {
@@ -11,6 +12,10 @@ export async function run({ argv, cwd, packageRoot, stdin, stdout }) {
   }
   if (command === 'doctor') {
     await doctor({ argv: rest, cwd, packageRoot, stdout });
+    return;
+  }
+  if (command === 'export') {
+    await exportCmd({ argv: rest, cwd, stdout });
     return;
   }
   const installArgv = command === 'update' ? [...rest, '--force'] : rest;
