@@ -110,6 +110,94 @@ npx sast-skills install --yes --assistant claude --scope project
 
 > If your project already contains a `CLAUDE.md` or `AGENTS.md`, the installer refuses to clobber it by default — back it up or pass `--force`.
 
+### Manual install (without `npx` / npm)
+
+Use this path if you can't run `npx` (corporate proxy, npm registry unreachable, offline environment) or if you want to pin to this fork's source rather than the published npm package. The CLI installer only does two things — drop the orchestrator entry file at the project root and mirror each skill's `SKILL.md` into the right hidden directory — so a plain `cp -R` reproduces it exactly.
+
+#### 1. Get the bundled files
+
+```bash
+git clone https://github.com/mstfknn/sast-skills.git
+```
+
+Everything you need lives under `sast-skills/sast-files/`:
+
+```text
+sast-files/
+├── CLAUDE.md                       # Orchestrator entry for Claude Code
+├── AGENTS.md                       # Orchestrator entry for Gemini CLI / Codex / OpenCode / Cursor
+├── .claude/skills/sast-*/SKILL.md  # 31 skills in Claude Code format
+└── .agents/skills/sast-*/SKILL.md  # Same 31 skills mirrored for AGENTS.md assistants
+```
+
+The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.
+
+#### 2a. Install for Claude Code
+
+Set `SAST_SRC` to the clone path so the commands below stay copy-pasteable:
+
+```bash
+export SAST_SRC=/absolute/path/to/sast-skills
+cd /path/to/your-project
+```
+
+**Project scope** (recommended — versioned alongside your repo):
+
+```bash
+cp "$SAST_SRC/sast-files/CLAUDE.md" ./CLAUDE.md
+cp -R "$SAST_SRC/sast-files/.claude" ./
+```
+
+> If you already use a project-level `CLAUDE.md`, **do not overwrite it** — Claude Code reads only one `CLAUDE.md` per project. Merge the orchestrator content (the four-phase flow) into your existing file instead.
+
+**Global scope** (skills available in every project; orchestrator still copied per-project):
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R "$SAST_SRC/sast-files/.claude/skills/." ~/.claude/skills/
+# Then in any project where you want the scan flow:
+cp "$SAST_SRC/sast-files/CLAUDE.md" /path/to/your-project/CLAUDE.md
+```
+
+#### 2b. Install for Gemini CLI (and other `AGENTS.md` assistants)
+
+```bash
+export SAST_SRC=/absolute/path/to/sast-skills
+cd /path/to/your-project
+cp "$SAST_SRC/sast-files/AGENTS.md" ./AGENTS.md
+cp -R "$SAST_SRC/sast-files/.agents" ./
+```
+
+`AGENTS.md` is the cross-assistant convention honored by Gemini CLI, Codex CLI, OpenCode, and Cursor. If your version of Gemini CLI looks for `GEMINI.md` instead, rename it — the content is unchanged:
+
+```bash
+mv AGENTS.md GEMINI.md
+```
+
+#### 3. Verify the install
+
+```bash
+# Project scope (Claude Code)
+ls CLAUDE.md && ls .claude/skills/ | head
+
+# Project scope (Gemini / AGENTS.md)
+ls AGENTS.md && ls .agents/skills/ | head
+
+# Global scope (Claude Code)
+ls ~/.claude/skills/ | head
+```
+
+You should see all 31 `sast-*` skill directories. Open the project in your assistant and prompt **"Run vulnerability scan"** — the orchestrator inside `CLAUDE.md` / `AGENTS.md` drives the four phases from there.
+
+#### 4. Keeping a manual install up to date
+
+```bash
+cd "$SAST_SRC" && git pull
+# Re-run the cp commands from Step 2a / 2b to refresh — they're idempotent.
+```
+
+If you keep the clone around, `cd "$SAST_SRC" && git pull && <rerun cp>` is the manual equivalent of `npx sast-skills update`.
+
 ### CLI commands
 
 | Command | What it does |
