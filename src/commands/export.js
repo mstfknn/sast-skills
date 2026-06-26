@@ -1,6 +1,11 @@
 import { readFile, writeFile, stat, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
+async function packageVersion() {
+  const pkgUrl = new URL('../../package.json', import.meta.url);
+  return JSON.parse(await readFile(pkgUrl, 'utf8')).version;
+}
+
 const SEVERITY_TO_SARIF_LEVEL = {
   critical: 'error',
   high: 'error',
@@ -90,7 +95,7 @@ export async function exportCmd({ argv, stdout }) {
         const parsed = JSON.parse(await readFile(join(input, f), 'utf8'));
         if (Array.isArray(parsed.findings)) findings.push(...parsed.findings);
       }
-      data = { run: { tool: 'sast-skills', version: '0.1.0' }, findings };
+      data = { run: { tool: 'sast-skills', version: await packageVersion() }, findings };
     }
   } else {
     data = JSON.parse(await readFile(input, 'utf8'));

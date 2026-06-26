@@ -98,6 +98,20 @@ test('export --input <dir> aggregates every *-results.json in the directory', as
   expect(parsed.findings.map((f) => f.id).sort()).toEqual(['s1', 'x1']);
 });
 
+test('export --input <dir> stamps run.version from the actual package version', async () => {
+  const sastDir = join(workdir, 'sast');
+  const { mkdir } = await import('node:fs/promises');
+  await mkdir(sastDir, { recursive: true });
+  await writeFile(join(sastDir, 'sqli-results.json'), JSON.stringify({ findings: [] }));
+
+  const pkg = JSON.parse(await readFile(resolve(here, '..', 'package.json'), 'utf8'));
+  const { stdout } = await run(['export', '--format', 'json', '--input', sastDir]);
+  const parsed = JSON.parse(stdout);
+
+  expect(parsed.run.version).toBe(pkg.version); // not a hard-coded literal
+  expect(parsed.run.tool).toBe('sast-skills');
+});
+
 test('export --output writes to the given file instead of stdout', async () => {
   const input = join(workdir, 'findings.json');
   const out = join(workdir, 'report.html');
