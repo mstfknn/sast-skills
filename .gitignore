@@ -84,3 +84,6 @@ temp/
 
 # SAST output (produced when this repo scans itself or a user's project)
 sast/
+
+# Subagent-driven-development scratch (ledger, briefs, review packages)
+.superpowers/
