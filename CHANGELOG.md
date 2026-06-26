@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `sast-skills export` now stamps `run.version` with the actual CLI version instead of a hard-coded `0.1.0`, so SARIF/JSON reports label the correct tool version.
+
 ## [0.1.3] — 2026-06-26
 
 ### Changed
