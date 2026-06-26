@@ -1,6 +1,6 @@
 # sast-skills
 
-[![npm version](https://img.shields.io/npm/v/sast-skills.svg?style=flat-square)](https://www.npmjs.com/package/sast-skills) [![CI](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml/badge.svg)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/npm/l/sast-skills.svg?style=flat-square)](LICENSE) [![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/sast-skills.svg?style=flat-square)](https://www.npmjs.com/package/sast-skills) [![CI](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml/badge.svg)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/mstfknn/sast-skills/badges/tests.json&style=flat-square)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/npm/l/sast-skills.svg?style=flat-square)](LICENSE) [![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
 
 Turn your LLM coding assistant into a fully featured SAST scanner. Drop-in agent skills for Claude Code, Codex, Opencode, Cursor, and any assistant that loads `CLAUDE.md` / `AGENTS.md` skill folders.
 
@@ -333,7 +333,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Developer loop:
 
 ```bash
 npm install
-npm test                                  # 75-test vitest suite (TDD-guard enabled)
+npm test                                  # vitest suite (TDD-guard enabled; count shown in the tests badge)
 npm run sync                              # mirror .claude/skills → .agents/skills
 node scripts/scaffold-skill.js sast-foo   # stub a new skill in both trees
 node scripts/register-skill.js sast-foo foo "Foo" "Foo injection description"

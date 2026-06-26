@@ -17,3 +17,40 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run lint:md
+
+  # Regenerate the test-count badge on the `badges` branch. Isolated from the
+  # test job so the contents:write token is never exposed to PR (incl. fork) runs.
+  badge:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Count tests
+        id: count
+        run: |
+          npx vitest run --reporter=json --outputFile=vitest-report.json >/dev/null 2>&1 || true
+          echo "count=$(node -p "require('./vitest-report.json').numTotalTests")" >> "$GITHUB_OUTPUT"
+      - name: Publish test-count badge to the badges branch
+        env:
+          COUNT: ${{ steps.count.outputs.count }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          tmp="$(mktemp -d)"
+          printf '{"schemaVersion":1,"label":"tests","message":"%s","color":"brightgreen"}\n' "$COUNT" > "$tmp/tests.json"
+          cd "$tmp"
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b badges
+          git add tests.json
+          git commit -q -m "chore(badge): test count = ${COUNT} [skip ci]"
+          git push -f -q "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" badges
