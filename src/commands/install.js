@@ -1,5 +1,6 @@
 import { readdir, copyFile, mkdir, access } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { homedir } from 'node:os';
 
 const ASSISTANT_LAYOUT = {
   claude: { entryFile: 'CLAUDE.md', skillsDir: '.claude' },
@@ -24,7 +25,7 @@ async function exists(path) {
 }
 
 export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt }) {
-  let target = cwd;
+  let target;
   let dryRun = false;
   let force = false;
   let yes = false;
@@ -61,6 +62,10 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
   if (!VALID_SCOPES.includes(scope)) {
     throw new Error(`Invalid --scope value: ${scope}. Expected one of: ${VALID_SCOPES.join(', ')}.`);
   }
+
+  // An explicit --target always wins. Otherwise the scope decides where skills
+  // land: global installs into the user's home (~/.claude/skills), project into cwd.
+  target ??= scope === 'global' ? homedir() : cwd;
 
   const srcRoot = resolve(packageRoot, 'sast-files');
 

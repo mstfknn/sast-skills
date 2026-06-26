@@ -141,20 +141,28 @@ test('install --force overwrites an existing CLAUDE.md', async () => {
   expect(after).toMatch(/SAST Security Assessment/);
 });
 
-test('install --scope global writes skills under $HOME and skips the entry file', async () => {
-  const { code } = await run([
-    'install',
-    '--yes',
-    '--assistant', 'claude',
-    '--scope', 'global',
-  ], { cwd: workdir, env: { HOME: workdir, USERPROFILE: workdir } });
-  expect(code).toBe(0);
+test('install --scope global writes skills under $HOME, not cwd, and skips the entry file', async () => {
+  const home = await mkdtemp(join(tmpdir(), 'sast-skills-home-'));
+  try {
+    const { code } = await run([
+      'install',
+      '--yes',
+      '--assistant', 'claude',
+      '--scope', 'global',
+    ], { cwd: workdir, env: { HOME: home, USERPROFILE: home } });
+    expect(code).toBe(0);
 
-  const skillFile = join(workdir, '.claude', 'skills', 'sast-analysis', 'SKILL.md');
-  expect((await stat(skillFile)).isFile()).toBe(true);
+    // Skills land under $HOME ...
+    const homeSkill = join(home, '.claude', 'skills', 'sast-analysis', 'SKILL.md');
+    expect((await stat(homeSkill)).isFile()).toBe(true);
 
-  const entries = await readdir(workdir);
-  expect(entries).not.toContain('CLAUDE.md');
+    // ... and NOT in the current working directory, and no entry file is written.
+    const cwdEntries = await readdir(workdir);
+    expect(cwdEntries).not.toContain('.claude');
+    expect(cwdEntries).not.toContain('CLAUDE.md');
+  } finally {
+    await rm(home, { recursive: true, force: true });
+  }
 });
 
 test('install rejects an invalid --assistant value with a clear error', async () => {
