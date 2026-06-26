@@ -54,6 +54,10 @@ Run the detection skills **selected by the router** in `sast/stack.md` — its `
 - Skip IaC if `sast/iac-results.md` already exists.
 - Skip Prompt Injection if `sast/promptinjection-results.md` already exists.
 - Skip LLM Output if `sast/llmoutput-results.md` already exists.
+- Skip Insecure Deserialization if `sast/deser-results.md` already exists.
+- Skip Error Handling if `sast/errorhandling-results.md` already exists.
+- Skip TLS Verification if `sast/tls-results.md` already exists.
+- Skip Cookie Flags if `sast/cookieflags-results.md` already exists.
 
 Start **one subagent per check**, all **in parallel**, each with a dedicated task. Give each subagent the same instruction pattern, using the skill name and paths from the table:
 
@@ -89,6 +93,10 @@ Start **one subagent per check**, all **in parallel**, each with a dedicated tas
 | sast-iac | `sast/iac-results.md` | `sast/iac-recon.md`, `sast/iac-batch-*.md` |
 | sast-promptinjection | `sast/promptinjection-results.md` | `sast/promptinjection-recon.md`, `sast/promptinjection-batch-*.md` |
 | sast-llmoutput | `sast/llmoutput-results.md` | `sast/llmoutput-recon.md`, `sast/llmoutput-batch-*.md` |
+| sast-deser | `sast/deser-results.md` | `sast/deser-recon.md`, `sast/deser-batch-*.md` |
+| sast-errorhandling | `sast/errorhandling-results.md` | `sast/errorhandling-recon.md`, `sast/errorhandling-batch-*.md` |
+| sast-tls | `sast/tls-results.md` | `sast/tls-recon.md`, `sast/tls-batch-*.md` |
+| sast-cookieflags | `sast/cookieflags-results.md` | `sast/cookieflags-recon.md`, `sast/cookieflags-batch-*.md` |
 
 Wait for all subagents to finish before proceeding.
 

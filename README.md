@@ -46,7 +46,7 @@ It runs all four phases and writes findings to `sast/`. Aggregate them with `npx
 
 ## ✨ Highlights
 
-- **32 skills across 28 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling), plus a tech-stack router.
+- **36 skills across 32 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling), plus a tech-stack router.
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
 - **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
 - **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
@@ -63,7 +63,7 @@ The orchestrator executes four phases — reconnaissance, parallel detection, sy
 flowchart TD
     U(["User: Run vulnerability scan"]) --> R{"CLAUDE.md / AGENTS.md orchestrator"}
     R --> S1["Step 1 — sast-analysis<br/>codebase and architecture map"]
-    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>28 skills: recon, batched verify, merge"]
+    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>32 skills: recon, batched verify, merge"]
     S2 -->|sast/*-results.md and *-results.json| S3["Step 3 — sast-report<br/>consolidate and rank"]
     S3 -->|sast/final-report.md| S4["Step 4 — sast-triage<br/>false-positive elimination,<br/>severity adjustment with evidence"]
     S4 -->|sast/final-report-triaged.md and triaged.json| EXP["npx sast-skills export<br/>JSON, SARIF, HTML"]
@@ -111,6 +111,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-jwt` | Insecure JWT implementations |
 | `sast-csrf` | Cross-Site Request Forgery |
 | `sast-cors` | CORS misconfiguration |
+| `sast-cookieflags` | Missing HttpOnly / Secure / SameSite on session cookies |
 
 ### Files, crypto & runtime
 
@@ -122,6 +123,8 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-prototype` | JavaScript prototype pollution |
 | `sast-redos` | Catastrophic-backtracking regex DoS |
 | `sast-race` | Race conditions and TOCTOU |
+| `sast-deser` | Insecure deserialization (gadget chains, pickle, unserialize) |
+| `sast-tls` | Disabled TLS certificate / hostname verification |
 
 ### Data exposure & supply chain
 
@@ -131,6 +134,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-pii` | PII and credential leakage to logs / telemetry / error pages |
 | `sast-deps` | Known-vulnerable dependencies (CVE in lockfiles) |
 | `sast-iac` | Insecure IaC (Dockerfile / Terraform / Kubernetes / GitHub Actions) |
+| `sast-errorhandling` | Fail-open logic, stack-trace / secret leaks, debug mode |
 
 ### Business logic & LLM-specific
 
@@ -175,8 +179,8 @@ Everything you need lives under `sast-skills/sast-files/`:
 sast-files/
 ├── CLAUDE.md                       # Orchestrator entry for Claude Code
 ├── AGENTS.md                       # Orchestrator entry for Gemini CLI / Codex / OpenCode / Cursor
-├── .claude/skills/sast-*/SKILL.md  # 32 skills in Claude Code format
-└── .agents/skills/sast-*/SKILL.md  # Same 32 skills mirrored for AGENTS.md assistants
+├── .claude/skills/sast-*/SKILL.md  # 36 skills in Claude Code format
+└── .agents/skills/sast-*/SKILL.md  # Same 36 skills mirrored for AGENTS.md assistants
 ```
 
 The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.
