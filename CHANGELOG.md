@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] — 2026-06-26
+
 ### Security
 
 - Updated dependencies to clear all 27 osv-scanner advisories (all dev-only/transitive). Bumped the runtime dependency `@clack/prompts` to `^1.6.0`, `vitest` to `^4.1.9`, and `markdownlint-cli2` to `^0.22.1`, and pinned fixed versions of vulnerable transitive dev deps (hono, vite, uuid, fast-uri, @anthropic-ai/sdk, js-yaml, markdown-it, smol-toml, qs, ip-address, brace-expansion) via `overrides`. `osv-scanner`: no issues found; `npm audit`: 0.
@@ -87,7 +89,8 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/mstfknn/sast-skills/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/mstfknn/sast-skills/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/mstfknn/sast-skills/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/mstfknn/sast-skills/compare/v0.1.1...v0.1.2
