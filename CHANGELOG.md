@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-06-26
+
+### Changed
+
+- Release pipeline now publishes via npm **OIDC trusted publishing** instead of a long-lived `NPM_TOKEN` secret, and gates `npm publish` behind a dedicated test job (`needs: test`) that also runs markdown lint.
+
+### Fixed
+
+- Corrected the GitHub Code Scanning example in the README to reference `mstfknn/sast-skills` (was the upstream `utkusen/sast-skills` path).
+
 ## [0.1.1] — 2026-06-26
 
 ### Fixed
@@ -61,6 +71,7 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/mstfknn/sast-skills/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/mstfknn/sast-skills/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mstfknn/sast-skills/releases/tag/v0.1.0
