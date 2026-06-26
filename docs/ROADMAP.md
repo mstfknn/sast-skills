@@ -27,7 +27,7 @@ Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 - [Milestone 0 — Infra](roadmap/milestone-0-infra.md) (schema v2 · router · framework profiles) — ✅ shipped v0.3.0
 - [Milestone 1 — Tier A](roadmap/milestone-1.md) (13 skills) — ✅ shipped v0.4.0
 - [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills) — ✅ shipped v0.5.0
-- [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills)
+- [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills) — ✅ shipped v0.6.0
 - [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills)
 - [Backlog](roadmap/milestone-backlog.md) (6 skills)
 
@@ -84,7 +84,7 @@ This surface is uniquely yours because the product *is* skills. Under active att
 | `sast-cloudsdk` | cloud SDK misuse, public bucket, hardcoded IAM credential | Web25 A02 |
 | `sast-postmessage` | postMessage origin missing, CSWSH, tabnabbing | Web25 A01 |
 
-- [ ] Author all 7 (depends on Milestone 0 framework profiles for acceptable FP).
+- [x] Author all 7 (depends on Milestone 0 framework profiles for acceptable FP). — ✅ shipped v0.6.0
 
 ## Milestone 4 — LLM / agentic semantic (Tier C, heavy triage)
 
