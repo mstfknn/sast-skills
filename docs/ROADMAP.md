@@ -26,7 +26,7 @@ Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 
 - [Milestone 0 — Infra](roadmap/milestone-0-infra.md) (schema v2 · router · framework profiles) — ✅ shipped v0.3.0
 - [Milestone 1 — Tier A](roadmap/milestone-1.md) (13 skills) — ✅ shipped v0.4.0
-- [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills)
+- [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills) — ✅ shipped v0.5.0
 - [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills)
 - [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills)
 - [Backlog](roadmap/milestone-backlog.md) (6 skills)
@@ -70,7 +70,7 @@ This surface is uniquely yours because the product *is* skills. Under active att
 | `sast-configrce` | repo-controlled config → execution layer (`CLAUDE.md`, `.mcp.json`, Actions) | Skills26 | B |
 | `sast-agentidentity` | agent NHI (service account / token / key) over-scoped | ASI26 ASI03 | B |
 
-- [ ] Author all 4.
+- [x] Author all 4. — ✅ shipped v0.5.0
 
 ## Milestone 3 — API / auth depth (Tier B, framework-awareness needed)
 
