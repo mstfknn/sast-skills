@@ -8,7 +8,10 @@ async function exists(path) { try { await access(path); return true; } catch { r
 
 export async function update({ argv, cwd, packageRoot, stdout, isTTY, prompt }) {
   if (argv.includes('--assistant')) {
-    await install({ argv: [...argv, '--force'], cwd, packageRoot, stdout, isTTY, prompt });
+    const summary = await install({ argv: [...argv, '--force'], cwd, packageRoot, stdout, isTTY, prompt });
+    if (summary) {
+      stdout.write(`Refreshed ${summary.entryFiles.join(', ')} + ${summary.skillCount} skills.\n`);
+    }
     return;
   }
 
@@ -19,14 +22,15 @@ export async function update({ argv, cwd, packageRoot, stdout, isTTY, prompt }) 
   const entryFiles = [...new Map(AGENTS.map((a) => [a.entryFile, a])).values()];
   const trees = [...new Set(AGENTS.map((a) => a.skillTree))];
 
-  let refreshed = 0;
+  const refreshedEntries = [];
+  let skillCount = 0;
 
   for (const a of entryFiles) {
     const dst = resolve(target, a.entryFile);
     const content = await read(dst);
     if (content !== null && content.includes(ORCHESTRATOR_SIGNATURE)) {
       await copyFile(resolve(srcRoot, ENTRY_SOURCE[a.skillTree]), dst);
-      refreshed++;
+      refreshedEntries.push(a.entryFile);
     }
   }
 
@@ -35,15 +39,19 @@ export async function update({ argv, cwd, packageRoot, stdout, isTTY, prompt }) 
     if (!(await exists(skillsDir))) continue;
     const installed = (await readdir(skillsDir)).filter((n) => n.startsWith('sast-'));
     if (installed.length === 0) continue;
-    for (const name of await readdir(resolve(srcRoot, tree, 'skills'))) {
+    const names = await readdir(resolve(srcRoot, tree, 'skills'));
+    for (const name of names) {
       const out = resolve(target, tree, 'skills', name, 'SKILL.md');
       await mkdir(dirname(out), { recursive: true });
       await copyFile(resolve(srcRoot, tree, 'skills', name, 'SKILL.md'), out);
     }
-    refreshed++;
+    skillCount = names.length;
   }
 
-  if (refreshed === 0) {
+  if (refreshedEntries.length === 0 && skillCount === 0) {
     throw new Error('No sast-skills install found in target — run "npx sast-skills install".');
   }
+
+  const entryPart = refreshedEntries.length ? refreshedEntries.join(', ') : 'skill tree';
+  stdout.write(`Refreshed ${entryPart} + ${skillCount} skills.\n`);
 }

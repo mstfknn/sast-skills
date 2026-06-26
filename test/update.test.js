@@ -74,3 +74,11 @@ test('update restores missing skill files and refreshes stale ones', async () =>
   const refreshed = await (await import('node:fs/promises')).readFile(staleSkill, 'utf8');
   expect(refreshed).not.toBe('outdated content');
 });
+
+test('update prints a refresh summary on success', async () => {
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'claude', '--scope', 'project']);
+  const { code, stdout } = await run(['update', '--yes', '--target', workdir]);
+  expect(code).toBe(0);
+  expect(stdout).toMatch(/Refreshed/i);
+  expect(stdout).toMatch(/skill/i);
+});
