@@ -61,3 +61,10 @@ test('doctor verifies a non-claude assistant (cursor) install', async () => {
   expect(stdout).toMatch(/AGENTS\.md: OK/);
   expect(stdout).toMatch(/\.agents\/skills.*OK/);
 });
+
+test('doctor verifies an install via the legacy agents alias', async () => {
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'codex', '--scope', 'project']);
+  const { code, stdout } = await run(['doctor', '--target', workdir, '--assistant', 'agents']);
+  expect(code).toBe(0);
+  expect(stdout).toMatch(/AGENTS\.md: OK/);
+});

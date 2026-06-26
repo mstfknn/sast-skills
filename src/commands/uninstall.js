@@ -1,6 +1,6 @@
 import { rm, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { AGENTS, ENTRY_SOURCE } from '../agents.js';
+import { agentById, ENTRY_SOURCE } from '../agents.js';
 
 async function readIfExists(path) {
   try {
@@ -20,7 +20,7 @@ export async function uninstall({ argv, cwd, packageRoot }) {
     else if (argv[i] === '--force') force = true;
   }
 
-  const agent = AGENTS.find((a) => a.id === assistant);
+  const agent = agentById(assistant);
   if (!agent) throw new Error(`Unknown assistant: ${assistant}.`);
   const { entryFile, skillTree } = agent;
   const entryDst = resolve(target, entryFile);

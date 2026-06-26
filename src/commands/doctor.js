@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { AGENTS, ENTRY_SOURCE } from '../agents.js';
+import { agentById, ENTRY_SOURCE } from '../agents.js';
 
 async function readIfExists(path) {
   try { return await readFile(path, 'utf8'); } catch { return null; }
@@ -19,7 +19,7 @@ export async function doctor({ argv, cwd, packageRoot, stdout }) {
     else if (argv[i] === '--assistant') assistant = argv[++i];
   }
 
-  const agent = AGENTS.find((a) => a.id === assistant);
+  const agent = agentById(assistant);
   if (!agent) throw new Error(`Unknown assistant: ${assistant}.`);
   const { entryFile, skillTree } = agent;
   const srcRoot = resolve(packageRoot, 'sast-files');

@@ -49,7 +49,8 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
     }
   }
 
-  if (selection === null || selection.length === 0) selection = ['claude'];
+  if (selection === null) selection = ['claude'];
+  else if (selection.length === 0) throw new Error('No assistants selected — nothing to install.');
   scope ??= 'project';
 
   if (!['project', 'global'].includes(scope)) {

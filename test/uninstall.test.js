@@ -67,3 +67,11 @@ test('uninstall removes a cursor (AGENTS.md/.agents) install', async () => {
   await expect(access(join(workdir, 'AGENTS.md'))).rejects.toBeTruthy();
   await expect(access(join(workdir, '.agents', 'skills'))).rejects.toBeTruthy();
 });
+
+test('uninstall removes an install via the legacy agents alias', async () => {
+  const { access } = await import('node:fs/promises');
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'codex', '--scope', 'project']);
+  const { code } = await run(['uninstall', '--target', workdir, '--assistant', 'agents', '--force']);
+  expect(code).toBe(0);
+  await expect(access(join(workdir, 'AGENTS.md'))).rejects.toBeTruthy();
+});

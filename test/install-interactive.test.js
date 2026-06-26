@@ -46,3 +46,11 @@ test('install returns a summary of what it wrote', async () => {
   expect(summary.labels).toEqual(expect.arrayContaining(['Claude Code', 'Cursor']));
   expect(summary.skillCount).toBeGreaterThan(0);
 });
+
+test('install errors on an empty assistant selection instead of silently defaulting', async () => {
+  const prompt = async ({ name }) => (name === 'assistant' ? [] : 'project');
+  const stdout = { write: () => {} };
+  await expect(
+    install({ packageRoot, argv: ['--target', workdir], cwd: workdir, stdout, isTTY: true, prompt }),
+  ).rejects.toThrow(/No assistants selected/i);
+});

@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { AGENTS, ENTRY_SOURCE, ORCHESTRATOR_SIGNATURE, validIds, resolveAgents } from '../src/agents.js';
+import { AGENTS, ENTRY_SOURCE, ORCHESTRATOR_SIGNATURE, validIds, resolveAgents, agentById } from '../src/agents.js';
 
 test('registry has 14 agents with unique ids and complete fields', () => {
   expect(AGENTS).toHaveLength(14);
@@ -41,4 +41,10 @@ test('resolveAgents dedupes by id and throws on unknown', () => {
 test('ENTRY_SOURCE and signature are exported', () => {
   expect(ENTRY_SOURCE).toEqual({ '.claude': 'CLAUDE.md', '.agents': 'AGENTS.md' });
   expect(ORCHESTRATOR_SIGNATURE).toBe('SAST Security Assessment');
+});
+
+test('agentById returns the agent, resolves the agents alias, and null for unknown', () => {
+  expect(agentById('claude')).toMatchObject({ entryFile: 'CLAUDE.md', skillTree: '.claude' });
+  expect(agentById('agents')).toMatchObject({ entryFile: 'AGENTS.md', skillTree: '.agents' });
+  expect(agentById('nope')).toBeNull();
 });
