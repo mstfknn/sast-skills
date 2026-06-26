@@ -9,3 +9,15 @@ export function BANNER(version) {
     '',
   ].join('\n');
 }
+
+export function summaryText({ scope, labels, entryFiles, skillCount }) {
+  const lines = [
+    `Installed for ${labels.length} assistant${labels.length === 1 ? '' : 's'} (${scope}): ${labels.join(', ')}.`,
+    `Wrote: ${entryFiles.join(', ')}  +  ${skillCount} skills.`,
+    'Prompt your assistant: "Run vulnerability scan".',
+  ];
+  if (labels.includes('Aider')) {
+    lines.push('Aider: add `--read CONVENTIONS.md` or set it in `.aider.conf.yml` so Aider loads it.');
+  }
+  return lines.join('\n');
+}

@@ -1,9 +1,11 @@
+import { intro, note, outro } from '@clack/prompts';
 import { install } from './commands/install.js';
 import { update } from './commands/update.js';
 import { uninstall } from './commands/uninstall.js';
 import { doctor } from './commands/doctor.js';
 import { exportCmd } from './commands/export.js';
 import { clackPrompt } from './prompts/clack.js';
+import { summaryText } from './banner.js';
 
 export async function run({ argv, cwd, packageRoot, stdin, stdout }) {
   const [command, ...rest] = argv;
@@ -23,7 +25,11 @@ export async function run({ argv, cwd, packageRoot, stdin, stdout }) {
     await update({ argv: rest, cwd, packageRoot, stdout, isTTY: Boolean(stdin.isTTY), prompt: clackPrompt });
     return;
   }
-  await install({
+  const interactive = Boolean(stdin.isTTY) && !rest.includes('--yes');
+  if (interactive) {
+    intro('sast-skills installer');
+  }
+  const summary = await install({
     argv: rest,
     cwd,
     packageRoot,
@@ -31,4 +37,8 @@ export async function run({ argv, cwd, packageRoot, stdin, stdout }) {
     isTTY: Boolean(stdin.isTTY),
     prompt: clackPrompt,
   });
+  if (interactive && summary) {
+    note(summaryText(summary), 'Done');
+    outro('Happy scanning');
+  }
 }
