@@ -54,17 +54,26 @@ ${rows}
 
 function toSarif(data) {
   const rules = [...new Set(data.findings.map((f) => f.skill))].map((id) => ({ id }));
-  const results = data.findings.map((f) => ({
-    ruleId: f.skill,
-    level: SEVERITY_TO_SARIF_LEVEL[f.severity] ?? 'warning',
-    message: { text: `${f.title}\n\n${f.description}` },
-    locations: [{
-      physicalLocation: {
-        artifactLocation: { uri: f.location.file },
-        region: { startLine: f.location.line, startColumn: f.location.column },
-      },
-    }],
-  }));
+  const results = data.findings.map((f) => {
+    const result = {
+      ruleId: f.skill,
+      level: SEVERITY_TO_SARIF_LEVEL[f.severity] ?? 'warning',
+      message: { text: `${f.title}\n\n${f.description}` },
+      locations: [{
+        physicalLocation: {
+          artifactLocation: { uri: f.location.file },
+          region: { startLine: f.location.line, startColumn: f.location.column },
+        },
+      }],
+    };
+    // Schema v2 fields are optional — only surface them when present (v1 findings omit them).
+    const props = {};
+    if (f.exploitability) props.exploitability = f.exploitability;
+    if (f.confidence) props.confidence = f.confidence;
+    if (f.chain_id) props.chain_id = f.chain_id;
+    if (Object.keys(props).length > 0) result.properties = props;
+    return result;
+  });
   return {
     version: '2.1.0',
     runs: [{ tool: { driver: { name: data.run.tool, rules } }, results }],
@@ -95,7 +104,7 @@ export async function exportCmd({ argv, stdout }) {
         const parsed = JSON.parse(await readFile(join(input, f), 'utf8'));
         if (Array.isArray(parsed.findings)) findings.push(...parsed.findings);
       }
-      data = { run: { tool: 'sast-skills', version: await packageVersion() }, findings };
+      data = { run: { tool: 'sast-skills', version: await packageVersion(), schema: '2.0' }, findings };
     }
   } else {
     data = JSON.parse(await readFile(input, 'utf8'));

@@ -98,6 +98,38 @@ test('export --input <dir> aggregates every *-results.json in the directory', as
   expect(parsed.findings.map((f) => f.id).sort()).toEqual(['s1', 'x1']);
 });
 
+test('export sarif maps exploitability/confidence to result properties; omits them for v1 findings', async () => {
+  const input = join(workdir, 'mixed.json');
+  await writeFile(input, JSON.stringify({
+    run: { tool: 'sast-skills', version: '0.3.0', schema: '2.0' },
+    findings: [
+      { id: '1', skill: 's', severity: 'high', title: 't', description: 'd', location: { file: 'x', line: 1, column: 1 }, remediation: '', exploitability: 'reachable', confidence: 'medium' },
+      { id: '2', skill: 's', severity: 'low', title: 't', description: 'd', location: { file: 'y', line: 2, column: 1 }, remediation: '' },
+    ],
+  }));
+
+  const { code, stdout } = await run(['export', '--format', 'sarif', '--input', input]);
+  expect(code).toBe(0);
+  const results = JSON.parse(stdout).runs[0].results;
+  expect(results[0].properties.exploitability).toBe('reachable');
+  expect(results[0].properties.confidence).toBe('medium');
+  expect(results[1].properties?.exploitability).toBeUndefined();
+});
+
+test('export aggregation stamps run.schema 2.0 and preserves new finding fields', async () => {
+  const sastDir = join(workdir, 'sast');
+  const { mkdir } = await import('node:fs/promises');
+  await mkdir(sastDir, { recursive: true });
+  const finding = { id: 'x', skill: 'sast-sqli', severity: 'high', title: 't', description: 'd', location: { file: 'a.js', line: 1, column: 1 }, remediation: '', exploitability: 'reachable', confidence: 'high', chain_id: 'c1' };
+  await writeFile(join(sastDir, 'sqli-results.json'), JSON.stringify({ findings: [finding] }));
+
+  const { stdout } = await run(['export', '--format', 'json', '--input', sastDir]);
+  const parsed = JSON.parse(stdout);
+  expect(parsed.run.schema).toBe('2.0');
+  expect(parsed.findings[0].exploitability).toBe('reachable');
+  expect(parsed.findings[0].chain_id).toBe('c1');
+});
+
 test('export --input <dir> stamps run.version from the actual package version', async () => {
   const sastDir = join(workdir, 'sast');
   const { mkdir } = await import('node:fs/promises');
