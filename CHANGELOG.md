@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-06-26
+
+### Changed
+
+- Bolder block-style ASCII install banner.
+- README polish: centered header block, a static **MIT** license badge, assistant names in their official form (e.g. "OpenAI Codex CLI", "Augment Code"), and the long manual-install section folded into a collapsible `<details>`.
+
 ## [0.2.1] — 2026-06-26
 
 ### Fixed
@@ -112,7 +119,8 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/mstfknn/sast-skills/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/mstfknn/sast-skills/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/mstfknn/sast-skills/compare/v0.1.5...v0.2.0
 [0.1.5]: https://github.com/mstfknn/sast-skills/compare/v0.1.4...v0.1.5
