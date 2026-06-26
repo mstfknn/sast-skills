@@ -36,13 +36,18 @@ afterEach(async () => {
 test('update with no --assistant auto-detects an existing install and refreshes it', async () => {
   await run(['install', '--yes', '--target', workdir, '--assistant', 'gemini', '--scope', 'project']);
   const skill = join(workdir, '.agents', 'skills', 'sast-sqli', 'SKILL.md');
+  const gemini = join(workdir, 'GEMINI.md');
   await writeFile(skill, 'outdated');
+  // Keep the orchestrator signature so update treats GEMINI.md as ours and refreshes it.
+  await writeFile(gemini, 'SAST Security Assessment\nSTALE-MARKER');
 
   const { code } = await run(['update', '--yes', '--target', workdir]);
   expect(code).toBe(0);
-  const refreshed = await (await import('node:fs/promises')).readFile(skill, 'utf8');
-  expect(refreshed).not.toBe('outdated');
-  expect((await stat(join(workdir, 'GEMINI.md'))).isFile()).toBe(true);
+  const { readFile } = await import('node:fs/promises');
+  expect(await readFile(skill, 'utf8')).not.toBe('outdated');
+  const refreshedGemini = await readFile(gemini, 'utf8');
+  expect(refreshedGemini).not.toMatch(/STALE-MARKER/);
+  expect(refreshedGemini).toMatch(/SAST Security Assessment/);
 });
 
 test('update leaves a non-ours entry file untouched and reports nothing to update', async () => {
