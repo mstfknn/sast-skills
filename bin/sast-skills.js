@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { run } from '../src/cli.js';
+import { BANNER } from '../src/banner.js';
 
 const [, , command, ...rest] = process.argv;
 const here = dirname(fileURLToPath(import.meta.url));
@@ -26,6 +27,10 @@ if (command === '--version') {
     '  --version    Print the installed version',
   ].join('\n'));
 } else if (command === 'install' || command === 'uninstall' || command === 'update' || command === 'doctor' || command === 'export') {
+  if ((command === 'install' || command === 'update') && process.stdin.isTTY) {
+    const pkg = JSON.parse(await readFile(resolve(packageRoot, 'package.json'), 'utf8'));
+    process.stdout.write(BANNER(pkg.version));
+  }
   try {
     await run({
       argv: [command, ...rest],

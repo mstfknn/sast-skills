@@ -2,6 +2,7 @@ import { test, expect, vi } from 'vitest';
 
 vi.mock('@clack/prompts', () => ({
   select: vi.fn(),
+  multiselect: vi.fn(),
   isCancel: vi.fn().mockReturnValue(false),
 }));
 
@@ -28,4 +29,11 @@ test('clackPrompt throws a user-friendly error when the user cancels', async () 
   await expect(
     clackPrompt({ name: 'assistant', choices: ['claude', 'agents'] }),
   ).rejects.toThrow(/cancel/i);
+});
+
+test('clackPrompt uses multiselect and returns an array when multi is set', async () => {
+  clack.multiselect = vi.fn().mockResolvedValueOnce(['claude', 'cursor']);
+  const result = await clackPrompt({ name: 'assistant', choices: ['claude', 'cursor', 'all'], multi: true });
+  expect(result).toEqual(['claude', 'cursor']);
+  expect(clack.multiselect).toHaveBeenCalledTimes(1);
 });

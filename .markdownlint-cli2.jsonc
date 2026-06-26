@@ -11,6 +11,7 @@
   "ignores": [
     "node_modules/**",
     "sast-files/**",
-    ".claude/**"
+    ".claude/**",
+    ".superpowers/**"
   ]
 }
