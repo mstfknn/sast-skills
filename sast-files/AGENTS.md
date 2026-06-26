@@ -71,6 +71,13 @@ Run the detection skills **selected by the router** in `sast/stack.md` — its `
 - Skip MCP Security if `sast/mcpsec-results.md` already exists.
 - Skip Config RCE if `sast/configrce-results.md` already exists.
 - Skip Agent Identity if `sast/agentidentity-results.md` already exists.
+- Skip Rate Limit if `sast/ratelimit-results.md` already exists.
+- Skip Session Security if `sast/session-results.md` already exists.
+- Skip OAuth/OIDC if `sast/oauth-results.md` already exists.
+- Skip Route Inventory if `sast/routeinventory-results.md` already exists.
+- Skip Unsafe Consumption if `sast/unsafeconsumption-results.md` already exists.
+- Skip Cloud SDK if `sast/cloudsdk-results.md` already exists.
+- Skip postMessage Trust if `sast/postmessage-results.md` already exists.
 
 Start **one subagent per check**, all **in parallel**, each with a dedicated task. Give each subagent the same instruction pattern, using the skill name and paths from the table:
 
@@ -123,6 +130,13 @@ Start **one subagent per check**, all **in parallel**, each with a dedicated tas
 | sast-mcpsec | `sast/mcpsec-results.md` | `sast/mcpsec-recon.md`, `sast/mcpsec-batch-*.md` |
 | sast-configrce | `sast/configrce-results.md` | `sast/configrce-recon.md`, `sast/configrce-batch-*.md` |
 | sast-agentidentity | `sast/agentidentity-results.md` | `sast/agentidentity-recon.md`, `sast/agentidentity-batch-*.md` |
+| sast-ratelimit | `sast/ratelimit-results.md` | `sast/ratelimit-recon.md`, `sast/ratelimit-batch-*.md` |
+| sast-session | `sast/session-results.md` | `sast/session-recon.md`, `sast/session-batch-*.md` |
+| sast-oauth | `sast/oauth-results.md` | `sast/oauth-recon.md`, `sast/oauth-batch-*.md` |
+| sast-routeinventory | `sast/routeinventory-results.md` | `sast/routeinventory-recon.md`, `sast/routeinventory-batch-*.md` |
+| sast-unsafeconsumption | `sast/unsafeconsumption-results.md` | `sast/unsafeconsumption-recon.md`, `sast/unsafeconsumption-batch-*.md` |
+| sast-cloudsdk | `sast/cloudsdk-results.md` | `sast/cloudsdk-recon.md`, `sast/cloudsdk-batch-*.md` |
+| sast-postmessage | `sast/postmessage-results.md` | `sast/postmessage-recon.md`, `sast/postmessage-batch-*.md` |
 
 Wait for all subagents to finish before proceeding.
 
