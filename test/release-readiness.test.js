@@ -32,6 +32,14 @@ test('publish.yml triggers on version tags, runs tests, and publishes to npm wit
   expect(content).toMatch(/id-token:\s*write/);
 });
 
+test('publish.yml gates publishing behind a separate test job via needs: and lints as a release gate', async () => {
+  const content = await readFile(resolve(repoRoot, '.github', 'workflows', 'publish.yml'), 'utf8');
+  // A dedicated publish job that depends on a test job — publish cannot start unless tests pass.
+  expect(content).toMatch(/needs:\s*test\b/);
+  // The release path also runs markdown lint, matching test.yml's gates.
+  expect(content).toMatch(/npm run lint:md/);
+});
+
 test('issue templates for bug report, feature request, and skill proposal exist and declare labels', async () => {
   const bug = await readFile(resolve(repoRoot, '.github', 'ISSUE_TEMPLATE', 'bug_report.yml'), 'utf8');
   const feat = await readFile(resolve(repoRoot, '.github', 'ISSUE_TEMPLATE', 'feature_request.yml'), 'utf8');
