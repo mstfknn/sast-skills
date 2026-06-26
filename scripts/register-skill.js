@@ -6,20 +6,30 @@ function patchOrchestrator(content, { name, resultsBasename, label }) {
   const skipLine = `- Skip ${label} if \`sast/${resultsBasename}-results.md\` already exists.`;
   const tableRow = `| ${name} | \`sast/${resultsBasename}-results.md\` | \`sast/${resultsBasename}-recon.md\`, \`sast/${resultsBasename}-batch-*.md\` |`;
   const lines = content.split('\n');
-  let lastSkip = -1;
-  let lastRow = -1;
-  lines.forEach((line, i) => {
-    if (line.startsWith('- Skip ') && line.includes('-results.md')) lastSkip = i;
-    if (line.startsWith('| sast-') && !line.startsWith('| sast-report')) lastRow = i;
-  });
-  lines.splice(lastRow + 1, 0, tableRow);
-  lines.splice(lastSkip + 1, 0, skipLine);
+
+  // Idempotent: only insert lines that aren't already present, so re-registering
+  // an existing skill is a no-op instead of appending duplicate rows.
+  if (!lines.includes(tableRow)) {
+    let lastRow = -1;
+    lines.forEach((line, i) => {
+      if (line.startsWith('| sast-') && !line.startsWith('| sast-report')) lastRow = i;
+    });
+    lines.splice(lastRow + 1, 0, tableRow);
+  }
+  if (!lines.includes(skipLine)) {
+    let lastSkip = -1;
+    lines.forEach((line, i) => {
+      if (line.startsWith('- Skip ') && line.includes('-results.md')) lastSkip = i;
+    });
+    lines.splice(lastSkip + 1, 0, skipLine);
+  }
   return lines.join('\n');
 }
 
 function patchReadme(content, { name, description }) {
   const row = `| ${name} | ${description} |`;
   const lines = content.split('\n');
+  if (lines.includes(row)) return content;
   const reportIdx = lines.findIndex((l) => l.startsWith('| sast-report'));
   lines.splice(reportIdx, 0, row);
   return lines.join('\n');

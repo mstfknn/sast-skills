@@ -98,6 +98,23 @@ test('scripts/register-skill.js is callable as a CLI via argv positional argumen
   expect(claude).toMatch(/\| sast-xxx \| `sast\/xxx-results\.md`/);
 });
 
+test('registerSkill is idempotent — running twice does not duplicate skip lines or table rows', async () => {
+  await registerSkill({ ...FIXTURE, repoRoot: workdir });
+  await registerSkill({ ...FIXTURE, repoRoot: workdir });
+
+  const claude = await readFile(join(workdir, 'sast-files', 'CLAUDE.md'), 'utf8');
+  const agents = await readFile(join(workdir, 'sast-files', 'AGENTS.md'), 'utf8');
+  const readme = await readFile(join(workdir, 'README.md'), 'utf8');
+
+  const count = (haystack, needle) => haystack.split(needle).length - 1;
+
+  for (const doc of [claude, agents]) {
+    expect(count(doc, 'Skip CSRF if `sast/csrf-results.md` already exists.')).toBe(1);
+    expect(count(doc, '| sast-csrf | `sast/csrf-results.md`')).toBe(1);
+  }
+  expect(count(readme, '| sast-csrf | Cross-Site Request Forgery |')).toBe(1);
+});
+
 test('registerSkill uses the name/label/description/resultsBasename args — not hard-coded CSRF', async () => {
   await registerSkill({
     repoRoot: workdir,
