@@ -46,7 +46,7 @@ It runs all four phases and writes findings to `sast/`. Aggregate them with `npx
 
 ## ✨ Highlights
 
-- **36 skills across 32 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling), plus a tech-stack router.
+- **45 skills across 41 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, CI/CD & cloud-metadata risks, business logic, and LLM-specific risks (prompt injection, insecure output handling), plus a tech-stack router.
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
 - **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
 - **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
@@ -63,7 +63,7 @@ The orchestrator executes four phases — reconnaissance, parallel detection, sy
 flowchart TD
     U(["User: Run vulnerability scan"]) --> R{"CLAUDE.md / AGENTS.md orchestrator"}
     R --> S1["Step 1 — sast-analysis<br/>codebase and architecture map"]
-    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>32 skills: recon, batched verify, merge"]
+    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>41 skills: recon, batched verify, merge"]
     S2 -->|sast/*-results.md and *-results.json| S3["Step 3 — sast-report<br/>consolidate and rank"]
     S3 -->|sast/final-report.md| S4["Step 4 — sast-triage<br/>false-positive elimination,<br/>severity adjustment with evidence"]
     S4 -->|sast/final-report-triaged.md and triaged.json| EXP["npx sast-skills export<br/>JSON, SARIF, HTML"]
@@ -101,6 +101,8 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-xxe` | XML External Entity |
 | `sast-ssrf` | Server-Side Request Forgery |
 | `sast-openredirect` | Open redirect (phishing / OAuth token theft) |
+| `sast-crlf` | CRLF / HTTP response splitting (header injection) |
+| `sast-ssrfimds` | Cloud metadata SSRF (IMDSv1 credential theft) |
 
 ### Access control & Auth
 
@@ -112,6 +114,8 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-csrf` | Cross-Site Request Forgery |
 | `sast-cors` | CORS misconfiguration |
 | `sast-cookieflags` | Missing HttpOnly / Secure / SameSite on session cookies |
+| `sast-massassign` | Mass assignment / overposting (privilege escalation) |
+| `sast-secheaders` | Missing security headers (CSP, HSTS, X-Frame-Options, SRI) |
 
 ### Files, crypto & runtime
 
@@ -125,6 +129,8 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-race` | Race conditions and TOCTOU |
 | `sast-deser` | Insecure deserialization (gadget chains, pickle, unserialize) |
 | `sast-tls` | Disabled TLS certificate / hostname verification |
+| `sast-zipslip` | Zip Slip — archive-extraction path traversal |
+| `sast-dangerousapi` | Dangerous API sinks (eval / exec / reflection / native bridges) |
 
 ### Data exposure & supply chain
 
@@ -135,6 +141,9 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-deps` | Known-vulnerable dependencies (CVE in lockfiles) |
 | `sast-iac` | Insecure IaC (Dockerfile / Terraform / Kubernetes / GitHub Actions) |
 | `sast-errorhandling` | Fail-open logic, stack-trace / secret leaks, debug mode |
+| `sast-excessivedata` | Excessive data exposure in API responses |
+| `sast-pipelineinj` | CI/CD pipeline injection (untrusted event payloads) |
+| `sast-depconfusion` | Dependency confusion + install-time script execution |
 
 ### Business logic & LLM-specific
 
@@ -179,8 +188,8 @@ Everything you need lives under `sast-skills/sast-files/`:
 sast-files/
 ├── CLAUDE.md                       # Orchestrator entry for Claude Code
 ├── AGENTS.md                       # Orchestrator entry for Gemini CLI / Codex / OpenCode / Cursor
-├── .claude/skills/sast-*/SKILL.md  # 36 skills in Claude Code format
-└── .agents/skills/sast-*/SKILL.md  # Same 36 skills mirrored for AGENTS.md assistants
+├── .claude/skills/sast-*/SKILL.md  # 45 skills in Claude Code format
+└── .agents/skills/sast-*/SKILL.md  # Same 45 skills mirrored for AGENTS.md assistants
 ```
 
 The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.

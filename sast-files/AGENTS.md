@@ -58,6 +58,15 @@ Run the detection skills **selected by the router** in `sast/stack.md` — its `
 - Skip Error Handling if `sast/errorhandling-results.md` already exists.
 - Skip TLS Verification if `sast/tls-results.md` already exists.
 - Skip Cookie Flags if `sast/cookieflags-results.md` already exists.
+- Skip Mass Assignment if `sast/massassign-results.md` already exists.
+- Skip Excessive Data Exposure if `sast/excessivedata-results.md` already exists.
+- Skip Security Headers if `sast/secheaders-results.md` already exists.
+- Skip CRLF Injection if `sast/crlf-results.md` already exists.
+- Skip Zip Slip if `sast/zipslip-results.md` already exists.
+- Skip Pipeline Injection if `sast/pipelineinj-results.md` already exists.
+- Skip Dependency Confusion if `sast/depconfusion-results.md` already exists.
+- Skip Dangerous API if `sast/dangerousapi-results.md` already exists.
+- Skip Cloud Metadata SSRF if `sast/ssrfimds-results.md` already exists.
 
 Start **one subagent per check**, all **in parallel**, each with a dedicated task. Give each subagent the same instruction pattern, using the skill name and paths from the table:
 
@@ -97,6 +106,15 @@ Start **one subagent per check**, all **in parallel**, each with a dedicated tas
 | sast-errorhandling | `sast/errorhandling-results.md` | `sast/errorhandling-recon.md`, `sast/errorhandling-batch-*.md` |
 | sast-tls | `sast/tls-results.md` | `sast/tls-recon.md`, `sast/tls-batch-*.md` |
 | sast-cookieflags | `sast/cookieflags-results.md` | `sast/cookieflags-recon.md`, `sast/cookieflags-batch-*.md` |
+| sast-massassign | `sast/massassign-results.md` | `sast/massassign-recon.md`, `sast/massassign-batch-*.md` |
+| sast-excessivedata | `sast/excessivedata-results.md` | `sast/excessivedata-recon.md`, `sast/excessivedata-batch-*.md` |
+| sast-secheaders | `sast/secheaders-results.md` | `sast/secheaders-recon.md`, `sast/secheaders-batch-*.md` |
+| sast-crlf | `sast/crlf-results.md` | `sast/crlf-recon.md`, `sast/crlf-batch-*.md` |
+| sast-zipslip | `sast/zipslip-results.md` | `sast/zipslip-recon.md`, `sast/zipslip-batch-*.md` |
+| sast-pipelineinj | `sast/pipelineinj-results.md` | `sast/pipelineinj-recon.md`, `sast/pipelineinj-batch-*.md` |
+| sast-depconfusion | `sast/depconfusion-results.md` | `sast/depconfusion-recon.md`, `sast/depconfusion-batch-*.md` |
+| sast-dangerousapi | `sast/dangerousapi-results.md` | `sast/dangerousapi-recon.md`, `sast/dangerousapi-batch-*.md` |
+| sast-ssrfimds | `sast/ssrfimds-results.md` | `sast/ssrfimds-recon.md`, `sast/ssrfimds-batch-*.md` |
 
 Wait for all subagents to finish before proceeding.
 
