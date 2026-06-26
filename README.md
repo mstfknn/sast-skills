@@ -4,9 +4,16 @@
 
 Turn your LLM coding assistant into a fully featured SAST scanner. Drop-in agent skills for Claude Code, Codex, Opencode, Cursor, and any assistant that loads `CLAUDE.md` / `AGENTS.md` skill folders.
 
-![Process in Claude Code](demo.gif)
-
 > Claude Code with Opus is recommended for quality; any capable model works.
+
+## Highlights
+
+- **31 skills across 28 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling).
+- **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
+- **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
+- **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
+- **Cross-assistant** — identical skills ship for Claude Code (`.claude/skills`) and every `AGENTS.md` assistant (`.agents/skills`).
+- **Zero-config CLI** — `install` / `update` / `uninstall` / `doctor` / `export`, published from GitHub Actions with npm provenance (SLSA attestation).
 
 ---
 
@@ -248,11 +255,10 @@ The orchestrator takes over. It runs all four phases automatically, respects ide
 
 ### Finding schema
 
-Every `sast/*-results.json` and `sast/triaged.json` conforms to:
+Each skill writes `sast/<skill>-results.json` as a bare findings list:
 
 ```jsonc
 {
-  "run": { "tool": "sast-skills", "version": "0.1.0" },
   "findings": [
     {
       "id": "sast-sqli-0001",
@@ -266,6 +272,8 @@ Every `sast/*-results.json` and `sast/triaged.json` conforms to:
   ]
 }
 ```
+
+`sast-skills export` aggregates those files into one document wrapped in a `run` envelope — `{ "run": { "tool": "sast-skills", "version": "<cli-version>" }, "findings": [...] }` — stamping the version of the CLI that produced the report. The triage step writes `sast/triaged.json` in that same enveloped shape.
 
 Triaged findings add `triage_status` (`confirmed|upgraded|downgraded|false_positive`), `triage_original_severity` (when severity changed), and `triage_evidence` with concrete codebase citations.
 
