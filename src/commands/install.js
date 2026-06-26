@@ -1,7 +1,7 @@
 import { readdir, copyFile, mkdir, access } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
-import { resolveAgents, ENTRY_SOURCE, validIds } from '../agents.js';
+import { resolveAgents, ENTRY_SOURCE, AGENTS } from '../agents.js';
 
 async function exists(path) {
   try { await access(path); return true; } catch { return false; }
@@ -42,10 +42,25 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
 
   if (!yes && isTTY) {
     if (selection === null) {
-      selection = await prompt({ name: 'assistant', choices: [...validIds(), 'all'], multi: true });
+      selection = await prompt({
+        name: 'assistant',
+        message: 'Which assistants should sast-skills install for?  (↑↓ move · space to select · enter to confirm)',
+        choices: [
+          ...AGENTS.map((a) => ({ value: a.id, label: a.label })),
+          { value: 'all', label: '✨ All of the above' },
+        ],
+        multi: true,
+      });
     }
     if (scope === undefined) {
-      scope = await prompt({ name: 'scope', choices: ['project', 'global'] });
+      scope = await prompt({
+        name: 'scope',
+        message: 'Install scope',
+        choices: [
+          { value: 'project', label: 'This project (./)' },
+          { value: 'global', label: 'Global (home directory)' },
+        ],
+      });
     }
   }
 

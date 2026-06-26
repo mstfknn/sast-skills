@@ -31,7 +31,7 @@ test('install in interactive mode multi-selects assistants and a scope', async (
 
   expect(asked.map((a) => a.name)).toEqual(['assistant', 'scope']);
   expect(asked[0].multi).toBe(true);
-  expect(asked[0].choices).toEqual(expect.arrayContaining(['claude', 'cursor', 'copilot', 'all']));
+  expect(asked[0].choices.map((c) => c.value)).toEqual(expect.arrayContaining(['claude', 'cursor', 'copilot', 'all']));
   expect((await stat(join(workdir, 'CLAUDE.md'))).isFile()).toBe(true);
 });
 
