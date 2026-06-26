@@ -78,7 +78,9 @@ tmp/
 temp/
 
 # TDD Guard local state (per-machine, ephemeral)
-/.claude/
+# Scoped to the tool's data dir so shareable .claude/ config (settings, commands)
+# can still be committed.
+/.claude/tdd-guard/
 
 # SAST output (produced when this repo scans itself or a user's project)
 sast/
