@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] — 2026-06-26
+
 ### Fixed
 
 - `sast-skills export` now stamps `run.version` with the actual CLI version instead of a hard-coded `0.1.0`, so SARIF/JSON reports label the correct tool version.
@@ -81,7 +83,8 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/mstfknn/sast-skills/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/mstfknn/sast-skills/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/mstfknn/sast-skills/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/mstfknn/sast-skills/compare/v0.1.0...v0.1.1
