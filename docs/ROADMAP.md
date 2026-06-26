@@ -20,6 +20,14 @@ Frameworks: `Web25` OWASP Top 10:2025 · `API23` API Security Top 10:2023 ·
 
 > Sub-detectors do **not** get their own skill (avoid fragmentation): weak PRNG / weak hash / ECB / IV reuse / key management stay inside `sast-crypto`; blind/internal/redirect SSRF stay inside `sast-ssrf`.
 
+## Detailed milestone plans
+
+Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
+
+- [Milestone 0 — Infra](roadmap/milestone-0-infra.md) (schema v2 · router · framework profiles)
+- [Milestone 1 — Tier A](roadmap/milestone-1.md) (format + first worked skill)
+- Milestones 2–4 + Backlog — to follow, same format.
+
 ## Milestone 0 — Infra first (do before mass skill authoring)
 
 Schema and orchestration changes are cheaper to do once, up front, than to retrofit across 35 skills.
