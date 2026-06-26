@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-06-26
+
+### Added
+
+- **Nine new Tier-A detection skills — Milestone 1 is complete.** Each ships the full recon → batched-verify → merge flow with per-language sink tables, FP-killers, and schema-v2 findings:
+  - `sast-massassign` — mass assignment / overposting (privilege escalation via `is_admin` / `role` / `balance`).
+  - `sast-excessivedata` — serializers returning the entire ORM object (password hashes, tokens) instead of an allow-list.
+  - `sast-secheaders` — missing `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, and CDN SRI.
+  - `sast-crlf` — CRLF / HTTP response splitting via untrusted input in headers, redirects, and logs.
+  - `sast-zipslip` — archive-extraction path traversal (arbitrary file write → RCE).
+  - `sast-pipelineinj` — untrusted CI event payloads interpolated into `run:` steps (resolves the dangling reference in `sast-stack`'s always-on set).
+  - `sast-depconfusion` — internal packages shadowable from public registries + install-time lifecycle scripts.
+  - `sast-dangerousapi` — inventory of `eval` / `exec` / reflection / native-bridge sinks for mandatory human review.
+  - `sast-ssrfimds` — cloud metadata SSRF (IMDSv1 credential theft → account takeover).
+- Totals are now **45 skills across 41 vulnerability classes**.
+
+### Fixed
+
+- `scripts/register-skill.js` placed new README rows past the License section (the table format changed to backtick'd rows during the visual overhaul, breaking its anchor). New rows now land inside a real detection-class table, and the script fails loudly rather than corrupting the file if no anchor row exists.
+
 ## [0.3.0] — 2026-06-26
 
 ### Added
