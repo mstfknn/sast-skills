@@ -16,7 +16,35 @@ Drop-in agent skills for **14 AI assistants** — Claude Code, OpenAI Codex CLI,
 
 > Claude Code with Opus is recommended for quality; any capable model works.
 
-## Highlights
+## ⚡ Quick start
+
+```bash
+npx sast-skills install   # pick your assistant(s) — ones found on your PATH are pre-enabled
+```
+
+Then open the project in your assistant and prompt:
+
+> **Run vulnerability scan**
+
+It runs all four phases and writes findings to `sast/`. Aggregate them with `npx sast-skills export --format sarif` for GitHub Code Scanning or CI.
+
+---
+
+## 📑 Table of contents
+
+- [✨ Highlights](#-highlights)
+- [🔄 Flow](#-flow)
+- [🔍 What it detects](#-what-it-detects)
+- [📦 Installation](#-installation)
+- [🚀 Running a scan](#-running-a-scan)
+- [🔌 CI integrations](#-ci-integrations)
+- [🩺 Verify & troubleshoot](#-verify--troubleshoot)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
+---
+
+## ✨ Highlights
 
 - **31 skills across 28 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling).
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
@@ -27,7 +55,7 @@ Drop-in agent skills for **14 AI assistants** — Claude Code, OpenAI Codex CLI,
 
 ---
 
-## Flow
+## 🔄 Flow
 
 The orchestrator executes four phases — reconnaissance, parallel detection, synthesis, and triage:
 
@@ -46,7 +74,7 @@ Every step is **idempotent**: if its output file already exists, the orchestrato
 
 ---
 
-## What it detects
+## 🔍 What it detects
 
 All skills follow the same three-phase pattern: **recon** → **batched verify** (parallel subagents, 3 per batch) → **merge**. Each writes a human-readable markdown report and a canonical JSON findings file that `sast-skills export` aggregates.
 
@@ -113,7 +141,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 
 ---
 
-## Installation
+## 📦 Installation
 
 ```bash
 npx sast-skills install
@@ -241,7 +269,7 @@ If you keep the clone around, `cd "$SAST_SRC" && git pull && <rerun cp>` is the 
 
 ---
 
-## Running a scan
+## 🚀 Running a scan
 
 After installing, open the project in your AI assistant and ask:
 
@@ -290,7 +318,7 @@ Triaged findings add `triage_status` (`confirmed|upgraded|downgraded|false_posit
 
 ---
 
-## CI integrations
+## 🔌 CI integrations
 
 ### GitHub Code Scanning (SARIF)
 
@@ -320,7 +348,7 @@ The bundled `Dockerfile` is `node:20-alpine`-based with `sast-skills` set as the
 
 ---
 
-## Verify & troubleshoot
+## 🩺 Verify & troubleshoot
 
 ```bash
 # Is the install in the expected shape?
@@ -338,7 +366,7 @@ npx sast-skills update
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Developer loop:
 
@@ -358,6 +386,6 @@ npm run lint:md                           # markdownlint
 
 ---
 
-## License
+## 📄 License
 
 MIT — see [LICENSE](LICENSE).
