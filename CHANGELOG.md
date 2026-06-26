@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-06-26
+
+### Added
+
+- **Milestone 2 — agentic-skills security (4 new skills).** A class most signature scanners miss: the threat surface is natural-language manipulation and misconfigured identity, so each skill pairs recon with an explicitly **LLM-driven** verify step.
+  - `sast-skillaudit` — hidden instructions and shell-sink lifecycle hooks in untrusted `SKILL.md` / `AGENT.md` / agent-rule config (CWE-77).
+  - `sast-mcpsec` — MCP tool-description poisoning and missing tool authentication on network-exposed transports (CWE-862).
+  - `sast-configrce` — repository config (`CLAUDE.md`, `.mcp.json`, workflows) that auto-executes shell at project open or checkout (CWE-94, the CVE-2025-59536 class).
+  - `sast-agentidentity` — agent / CI credentials and IAM roles scoped beyond the agent's task (CWE-269 / CWE-250).
+- A dedicated **Agentic & MCP security** category in the README "What it detects" section.
+- Totals are now **49 skills across 45 vulnerability classes**.
+
 ## [0.4.0] — 2026-06-26
 
 ### Added
