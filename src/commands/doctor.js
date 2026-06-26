@@ -1,19 +1,10 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
-
-const ASSISTANT_LAYOUT = {
-  claude: { entryFile: 'CLAUDE.md', skillsDir: '.claude' },
-  agents: { entryFile: 'AGENTS.md', skillsDir: '.agents' },
-};
+import { AGENTS, ENTRY_SOURCE } from '../agents.js';
 
 async function readIfExists(path) {
-  try {
-    return await readFile(path, 'utf8');
-  } catch {
-    return null;
-  }
+  try { return await readFile(path, 'utf8'); } catch { return null; }
 }
-
 function classify(installed, bundled) {
   if (installed === null) return 'MISSING';
   if (installed !== bundled) return 'MODIFIED';
@@ -28,24 +19,25 @@ export async function doctor({ argv, cwd, packageRoot, stdout }) {
     else if (argv[i] === '--assistant') assistant = argv[++i];
   }
 
-  const { entryFile, skillsDir } = ASSISTANT_LAYOUT[assistant];
+  const agent = AGENTS.find((a) => a.id === assistant);
+  if (!agent) throw new Error(`Unknown assistant: ${assistant}.`);
+  const { entryFile, skillTree } = agent;
   const srcRoot = resolve(packageRoot, 'sast-files');
   let ok = true;
 
-  const bundledEntry = await readIfExists(resolve(srcRoot, entryFile));
+  const bundledEntry = await readIfExists(resolve(srcRoot, ENTRY_SOURCE[skillTree]));
   const installedEntry = await readIfExists(resolve(target, entryFile));
   const entryStatus = classify(installedEntry, bundledEntry);
   if (entryStatus !== 'OK') ok = false;
   stdout.write(`${entryFile}: ${entryStatus}\n`);
 
-  const skillsSrc = resolve(srcRoot, skillsDir, 'skills');
-  const skills = await readdir(skillsSrc);
-  for (const name of skills) {
+  const skillsSrc = resolve(srcRoot, skillTree, 'skills');
+  for (const name of await readdir(skillsSrc)) {
     const bundled = await readIfExists(resolve(skillsSrc, name, 'SKILL.md'));
-    const installed = await readIfExists(resolve(target, skillsDir, 'skills', name, 'SKILL.md'));
+    const installed = await readIfExists(resolve(target, skillTree, 'skills', name, 'SKILL.md'));
     const status = classify(installed, bundled);
     if (status !== 'OK') ok = false;
-    stdout.write(`${skillsDir}/skills/${name}/SKILL.md: ${status}\n`);
+    stdout.write(`${skillTree}/skills/${name}/SKILL.md: ${status}\n`);
   }
 
   if (!ok) throw new Error('doctor detected issues');

@@ -53,3 +53,11 @@ test('doctor flags missing and modified files and exits non-zero', async () => {
   expect(stdout).toMatch(/sast-analysis.*MISSING/);
   expect(stdout).toMatch(/sast-sqli.*MODIFIED/);
 });
+
+test('doctor verifies a non-claude assistant (cursor) install', async () => {
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'cursor', '--scope', 'project']);
+  const { code, stdout } = await run(['doctor', '--target', workdir, '--assistant', 'cursor']);
+  expect(code).toBe(0);
+  expect(stdout).toMatch(/AGENTS\.md: OK/);
+  expect(stdout).toMatch(/\.agents\/skills.*OK/);
+});
