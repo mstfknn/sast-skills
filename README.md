@@ -333,7 +333,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Developer loop:
 
 ```bash
 npm install
-npm test                                  # vitest suite (TDD-guard enabled)
+npm test                                  # 75-test vitest suite (TDD-guard enabled)
 npm run sync                              # mirror .claude/skills → .agents/skills
 node scripts/scaffold-skill.js sast-foo   # stub a new skill in both trees
 node scripts/register-skill.js sast-foo foo "Foo" "Foo injection description"
