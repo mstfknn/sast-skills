@@ -1,8 +1,18 @@
-# sast-skills
+<div align="center">
 
-[![npm version](https://img.shields.io/npm/v/sast-skills.svg?style=flat-square)](https://www.npmjs.com/package/sast-skills) [![CI](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml/badge.svg)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/mstfknn/sast-skills/badges/tests.json&style=flat-square)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/npm/l/sast-skills.svg?style=flat-square)](LICENSE) [![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
+# 🛡️ sast-skills
 
-Turn your LLM coding assistant into a fully featured SAST scanner. Drop-in agent skills for **Claude Code, OpenAI Codex (CLI), Gemini CLI, GitHub Copilot, Cursor, Windsurf, OpenCode, Cline, Antigravity, Aider, Kilo Code, Augment, Hermes Agent, and Mistral Vibe**.
+**Turn your LLM coding assistant into a fully featured SAST scanner.**
+
+Drop-in agent skills for **14 AI assistants** — Claude Code, OpenAI Codex CLI, Gemini CLI, GitHub Copilot, Cursor, Windsurf, OpenCode, Cline, Antigravity, Aider, Kilo Code, Augment Code, Hermes Agent, and Mistral Vibe.
+
+[![npm version](https://img.shields.io/npm/v/sast-skills.svg?style=flat-square)](https://www.npmjs.com/package/sast-skills)
+[![CI](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml/badge.svg)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml)
+[![tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/mstfknn/sast-skills/badges/tests.json&style=flat-square)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
+
+</div>
 
 > Claude Code with Opus is recommended for quality; any capable model works.
 
@@ -117,11 +127,14 @@ npx sast-skills install --yes --assistant claude,cursor,copilot --scope project
 
 > If your project already contains a `CLAUDE.md` or `AGENTS.md`, the installer refuses to clobber it by default — back it up or pass `--force`.
 
-### Manual install (without `npx` / npm)
+<details>
+<summary><b>Manual install</b> (without <code>npx</code> / npm) — click to expand</summary>
+
+<br>
 
 Use this path if you can't run `npx` (corporate proxy, npm registry unreachable, offline environment) or if you want to pin to this fork's source rather than the published npm package. The CLI installer only does two things — drop the orchestrator entry file at the project root and mirror each skill's `SKILL.md` into the right hidden directory — so a plain `cp -R` reproduces it exactly.
 
-#### 1. Get the bundled files
+### 1. Get the bundled files
 
 ```bash
 git clone https://github.com/mstfknn/sast-skills.git
@@ -139,7 +152,7 @@ sast-files/
 
 The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.
 
-#### 2a. Install for Claude Code
+### 2a. Install for Claude Code
 
 Set `SAST_SRC` to the clone path so the commands below stay copy-pasteable:
 
@@ -166,7 +179,7 @@ cp -R "$SAST_SRC/sast-files/.claude/skills/." ~/.claude/skills/
 cp "$SAST_SRC/sast-files/CLAUDE.md" /path/to/your-project/CLAUDE.md
 ```
 
-#### 2b. Install for Gemini CLI (and other `AGENTS.md` assistants)
+### 2b. Install for Gemini CLI (and other `AGENTS.md` assistants)
 
 ```bash
 export SAST_SRC=/absolute/path/to/sast-skills
@@ -177,7 +190,7 @@ cp -R "$SAST_SRC/sast-files/.agents" ./
 
 Gemini CLI reads `GEMINI.md`; the installer writes it for you when you pick Gemini.
 
-#### 3. Verify the install
+### 3. Verify the install
 
 ```bash
 # Project scope (Claude Code)
@@ -192,7 +205,7 @@ ls ~/.claude/skills/ | head
 
 You should see all 31 `sast-*` skill directories. Open the project in your assistant and prompt **"Run vulnerability scan"** — the orchestrator inside `CLAUDE.md` / `AGENTS.md` drives the four phases from there.
 
-#### 4. Keeping a manual install up to date
+### 4. Keeping a manual install up to date
 
 ```bash
 cd "$SAST_SRC" && git pull
@@ -200,6 +213,8 @@ cd "$SAST_SRC" && git pull
 ```
 
 If you keep the clone around, `cd "$SAST_SRC" && git pull && <rerun cp>` is the manual equivalent of `npx sast-skills update`.
+
+</details>
 
 ### CLI commands
 

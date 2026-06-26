@@ -76,7 +76,7 @@ test('README reflects the full 0.1.0 surface: badges, flow diagram, every CLI co
   // badges
   expect(content).toMatch(/img\.shields\.io\/npm\/v\/sast-skills/);
   expect(content).toMatch(/github\.com\/mstfknn\/sast-skills\/actions\/workflows\/test\.yml/);
-  expect(content).toMatch(/img\.shields\.io\/npm\/l\/sast-skills/);
+  expect(content).toMatch(/img\.shields\.io\/badge\/License-MIT/);
   expect(content).toMatch(/node-%3E%3D20|node-version-%3E%3D20|node-20/i);
 
   // flow diagram — mermaid block
