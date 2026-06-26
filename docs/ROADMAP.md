@@ -24,8 +24,8 @@ Frameworks: `Web25` OWASP Top 10:2025 · `API23` API Security Top 10:2023 ·
 
 Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 
-- [Milestone 0 — Infra](roadmap/milestone-0-infra.md) (schema v2 · router · framework profiles)
-- [Milestone 1 — Tier A](roadmap/milestone-1.md) (13 skills)
+- [Milestone 0 — Infra](roadmap/milestone-0-infra.md) (schema v2 · router · framework profiles) — ✅ shipped v0.3.0
+- [Milestone 1 — Tier A](roadmap/milestone-1.md) (13 skills) — ✅ shipped v0.4.0
 - [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills)
 - [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills)
 - [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills)
@@ -35,9 +35,9 @@ Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 
 Schema and orchestration changes are cheaper to do once, up front, than to retrofit across 35 skills.
 
-- [ ] **Findings schema v2** — add `exploitability` / `confidence` (is the sink reachable from untrusted input?) and `chain_id` to the canonical JSON. Bump `run.tool` schema, update `sast-skills export`, `sast-report`, `sast-triage`, and the orchestrator schema doc.
-- [ ] **Tech-stack router** — an orchestration layer (not a vuln skill) that detects the stack (Spring / Django / FastAPI / Express / Rails) and triggers only the relevant skills with a framework profile injected. **Prerequisite, not optional:** 28 → ~63 skills makes a flat parallel Step-2 fan-out cost- and latency-prohibitive. Restructure the orchestrator to be router-driven.
-- [ ] **Framework-awareness profiles** — Django ORM, Spring Data, Rails strong params, Express helmet defaults. Lifts precision of every Tier-B skill; eliminates most of their false positives.
+- [x] **Findings schema v2** — add `exploitability` / `confidence` (is the sink reachable from untrusted input?) and `chain_id` to the canonical JSON. Bump `run.tool` schema, update `sast-skills export`, `sast-report`, `sast-triage`, and the orchestrator schema doc. — ✅ shipped v0.3.0
+- [x] **Tech-stack router** — an orchestration layer (not a vuln skill) that detects the stack (Spring / Django / FastAPI / Express / Rails) and triggers only the relevant skills with a framework profile injected. **Prerequisite, not optional:** 28 → ~63 skills makes a flat parallel Step-2 fan-out cost- and latency-prohibitive. Restructure the orchestrator to be router-driven. — ✅ shipped v0.3.0
+- [x] **Framework-awareness profiles** — Django ORM, Spring Data, Rails strong params, Express helmet defaults. Lifts precision of every Tier-B skill; eliminates most of their false positives. — ✅ shipped v0.3.0
 
 ## Milestone 1 — Clean static, high prevalence (Tier A, 13 skills)
 
@@ -57,7 +57,7 @@ Schema and orchestration changes are cheaper to do once, up front, than to retro
 | `sast-dangerousapi` | eval / reflection / native / process-spawn sink inventory | Web25 A05 |
 | `sast-ssrfimds` | cloud-metadata SSRF + IMDSv1 + cloud-context detection | Web25 A01 / API23 API7 |
 
-- [ ] Author all 13 (each = the per-skill task). `sast-deps` + `sast-depconfusion` + `sast-pipelineinj` together close Web25 **A03** — the highest-incidence, lowest-CVE-coverage category and the blind spot of signature scanners.
+- [x] Author all 13 (each = the per-skill task). `sast-deps` + `sast-depconfusion` + `sast-pipelineinj` together close Web25 **A03** — the highest-incidence, lowest-CVE-coverage category and the blind spot of signature scanners. — ✅ all 13 shipped (v0.3.0: `sast-deser` · `sast-errorhandling` · `sast-tls` · `sast-cookieflags`; v0.4.0: the remaining 9)
 
 ## Milestone 2 — Agentic-skills security (the niche; no standard scanner exists)
 
