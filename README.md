@@ -278,7 +278,7 @@ Triaged findings add `triage_status` (`confirmed|upgraded|downgraded|false_posit
 Composite action at `.github/actions/scan/action.yml`:
 
 ```yaml
-- uses: utkusen/sast-skills/.github/actions/scan@main
+- uses: mstfknn/sast-skills/.github/actions/scan@main
   with:
     input: sast/
     output: sast-skills.sarif
