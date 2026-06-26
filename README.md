@@ -109,10 +109,10 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 npx sast-skills install
 ```
 
-The installer asks which assistant to target (`claude` / `agents` / `all`) and whether to install into the current project or your user home directory (`project` / `global`). To skip prompts:
+The installer shows a multi-select of all 14 supported assistants (plus **All of the above**) and asks whether to install into the current project or your user home directory (`project` / `global`). To skip prompts, pass a comma-separated list of assistant ids (or `all`):
 
 ```bash
-npx sast-skills install --yes --assistant claude --scope project
+npx sast-skills install --yes --assistant claude,cursor,copilot --scope project
 ```
 
 > If your project already contains a `CLAUDE.md` or `AGENTS.md`, the installer refuses to clobber it by default — back it up or pass `--force`.
