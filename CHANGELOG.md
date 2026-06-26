@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-06-26
+
+### Added
+
+- **Tech-stack router (`sast-stack`)** — detects the project's stack(s) and frameworks, then selects a targeted subset of detection skills (plus an always-on set) and attaches a framework profile to each, writing the decision to `sast/stack.md`. Step 2 of the assessment is now router-driven and falls back to running the full catalog when no stack map exists.
+- **Framework-awareness profiles** — `django`, `spring`, `express`, `rails`, and `fastapi` fact sheets ship with the package and are copied into the install tree; detection skills read their assigned profile during verify to suppress framework-default false positives.
+- **Four new Tier-A detection skills** — `sast-deser` (insecure deserialization), `sast-errorhandling` (fail-open logic and stack-trace / secret leaks), `sast-tls` (disabled certificate / hostname verification), and `sast-cookieflags` (missing HttpOnly / Secure / SameSite). Totals are now **36 skills across 32 vulnerability classes**.
+- **Findings schema v2** — each finding may carry `exploitability` (reachable / conditional / unreachable / unknown), `confidence`, and `chain_id`. `sast-skills export` stamps the aggregated output with `run.schema: "2.0"` and maps the new fields to SARIF `properties`.
+
+### Changed
+
+- `sast-report` and `sast-triage` rank findings by exploitability and reconcile a `false_positive` verdict with an `unreachable` classification.
+
 ## [0.2.2] — 2026-06-26
 
 ### Changed
