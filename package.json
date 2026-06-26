@@ -12,7 +12,8 @@
     "sast-files/CLAUDE.md",
     "sast-files/AGENTS.md",
     "sast-files/.claude/skills",
-    "sast-files/.agents/skills"
+    "sast-files/.agents/skills",
+    "sast-files/profiles"
   ],
   "engines": {
     "node": ">=20"

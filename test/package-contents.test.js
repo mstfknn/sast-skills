@@ -37,3 +37,10 @@ test('npm pack ships CLI, src, and bundled skills but excludes tests and demo.gi
   expect(files).not.toContain('demo.gif');
   expect(files).not.toContain('vitest.config.js');
 }, 30_000);
+
+test('npm pack ships the framework profiles', async () => {
+  const files = await packedFiles();
+  expect(files).toContain('sast-files/profiles/django.md');
+  expect(files).toContain('sast-files/profiles/spring.md');
+  expect(files).toContain('sast-files/profiles/fastapi.md');
+}, 30_000);

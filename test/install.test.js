@@ -261,3 +261,9 @@ test('install rejects an unknown assistant id with a clean message', async () =>
   expect(stderr).toMatch(/Unknown assistant: bogus/);
   expect(stderr).not.toMatch(/install\.js/);
 });
+
+test('install copies the framework profiles alongside the skill tree', async () => {
+  const { code } = await run(['install', '--yes', '--target', workdir, '--assistant', 'claude', '--scope', 'project']);
+  expect(code).toBe(0);
+  expect((await stat(join(workdir, '.claude', 'profiles', 'django.md'))).isFile()).toBe(true);
+});

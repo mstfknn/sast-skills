@@ -19,6 +19,19 @@ async function copyTree(srcRoot, skillTree, target) {
   return skills.length;
 }
 
+// Framework-awareness profiles (shared across trees) ship next to the skills so
+// the router/skills can read `<tree>/profiles/<framework>.md` at scan time.
+async function copyProfiles(srcRoot, skillTree, target) {
+  const profilesSrc = resolve(srcRoot, 'profiles');
+  let names;
+  try { names = await readdir(profilesSrc); } catch { return; }
+  for (const name of names) {
+    const dst = resolve(target, skillTree, 'profiles', name);
+    await mkdir(dirname(dst), { recursive: true });
+    await copyFile(resolve(profilesSrc, name), dst);
+  }
+}
+
 export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt }) {
   let target;
   let dryRun = false;
@@ -119,7 +132,10 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
   }
 
   let skillCount = 0;
-  for (const tree of skillTrees) skillCount = await copyTree(srcRoot, tree, target);
+  for (const tree of skillTrees) {
+    skillCount = await copyTree(srcRoot, tree, target);
+    await copyProfiles(srcRoot, tree, target);
+  }
 
   return {
     scope,

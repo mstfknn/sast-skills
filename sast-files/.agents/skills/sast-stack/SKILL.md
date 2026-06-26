@@ -47,8 +47,11 @@ a repo can have several (a Python API + a React frontend + Terraform).
 ## Step 2: Select skills
 
 For each detected stack, include the detection skills that have a real sink surface in
-that stack, and exclude the rest. Map the framework to a profile id when one exists
-(`profiles/<framework>.md`).
+that stack, and exclude the rest. Map the framework to a profile id when one exists —
+the profile docs are installed next to the skills at `.claude/profiles/<framework>.md`
+(or `.agents/profiles/<framework>.md`); available profiles: `django`, `spring`,
+`express`, `rails`, `fastapi`. Detection skills read their assigned profile during
+verify to suppress framework-default false positives.
 
 **Always-on** (stack-independent — never skip): `sast-hardcodedsecrets`, `sast-deps`,
 `sast-iac`, `sast-pipelineinj`, `sast-crypto`.
