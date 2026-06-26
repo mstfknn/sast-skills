@@ -14,9 +14,17 @@ Run the sast-analysis skill directly (this one stays in-session since later step
 
 ---
 
+## Step 1b: Stack routing
+
+Run the sast-stack skill (in-session, like sast-analysis) to detect the stack(s) and decide which detection skills are worth running. It writes `sast/stack.md`. Skip this step if `sast/stack.md` already exists.
+
+**Wait for this step to finish before proceeding.**
+
+---
+
 ## Step 2: Vulnerability Detection (Parallel)
 
-Run all checks at the same time. Skip any task where the output file already exists.
+Run the detection skills **selected by the router** in `sast/stack.md` — its `skills` list plus the `always_on` set — all at the same time, passing each its `profile` when one is set. The table below is the **full catalog** of detection skills (and their result / intermediate files); the router picks a subset of it. If `sast/stack.md` is missing, fall back to running every skill in the table. Skip any task where the output file already exists.
 
 - Skip IDOR if `sast/idor-results.md` already exists.
 - Skip SQLi if `sast/sqli-results.md` already exists.

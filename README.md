@@ -46,7 +46,7 @@ It runs all four phases and writes findings to `sast/`. Aggregate them with `npx
 
 ## ✨ Highlights
 
-- **31 skills across 28 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling).
+- **32 skills across 28 vulnerability classes** — injection, broken access control, weak crypto, file handling, supply chain, business logic, and LLM-specific risks (prompt injection, insecure output handling), plus a tech-stack router.
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
 - **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
 - **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
@@ -83,6 +83,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | Skill | Role |
 |---|---|
 | `sast-analysis` | Codebase recon, architecture mapping, threat model |
+| `sast-stack` | Tech-stack router — picks which detection skills to run per project |
 | `sast-report` | Consolidate per-class findings into a ranked report |
 | `sast-triage` | Remove false positives and adjust severities with codebase evidence |
 
@@ -174,8 +175,8 @@ Everything you need lives under `sast-skills/sast-files/`:
 sast-files/
 ├── CLAUDE.md                       # Orchestrator entry for Claude Code
 ├── AGENTS.md                       # Orchestrator entry for Gemini CLI / Codex / OpenCode / Cursor
-├── .claude/skills/sast-*/SKILL.md  # 31 skills in Claude Code format
-└── .agents/skills/sast-*/SKILL.md  # Same 31 skills mirrored for AGENTS.md assistants
+├── .claude/skills/sast-*/SKILL.md  # 32 skills in Claude Code format
+└── .agents/skills/sast-*/SKILL.md  # Same 32 skills mirrored for AGENTS.md assistants
 ```
 
 The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.
