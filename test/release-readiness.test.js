@@ -28,7 +28,16 @@ test('publish.yml triggers on version tags, runs tests, and publishes to npm wit
   expect(content).toMatch(/registry-url:\s*['"]?https:\/\/registry\.npmjs\.org/);
   expect(content).toMatch(/npm test/);
   expect(content).toMatch(/npm publish[\s\S]*--provenance/);
-  expect(content).toMatch(/NODE_AUTH_TOKEN.*secrets\.NPM_TOKEN/);
+  expect(content).toMatch(/id-token:\s*write/);
+});
+
+test('publish.yml uses OIDC trusted publishing — upgrades npm and stores no NPM_TOKEN', async () => {
+  const content = await readFile(resolve(repoRoot, '.github', 'workflows', 'publish.yml'), 'utf8');
+  // OIDC trusted publishing requires npm >= 11.5.1; Node 20 ships npm 10.
+  expect(content).toMatch(/npm install -g npm@/);
+  // Auth comes from the GitHub OIDC identity, not a stored token.
+  expect(content).not.toMatch(/NODE_AUTH_TOKEN/);
+  expect(content).not.toMatch(/NPM_TOKEN/);
   expect(content).toMatch(/id-token:\s*write/);
 });
 
