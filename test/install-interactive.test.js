@@ -18,29 +18,31 @@ afterEach(async () => {
   await rm(workdir, { recursive: true, force: true });
 });
 
-test('install in interactive mode prompts for missing assistant and scope', async () => {
+test('install in interactive mode multi-selects assistants and a scope', async () => {
   const asked = [];
-  const prompt = async ({ name, choices }) => {
-    asked.push({ name, choices });
-    if (name === 'assistant') return 'claude';
+  const prompt = async ({ name, choices, multi }) => {
+    asked.push({ name, choices, multi });
+    if (name === 'assistant') return ['claude'];
     if (name === 'scope') return 'project';
     throw new Error(`unexpected prompt for ${name}`);
   };
-
   const stdout = { write: () => {} };
-  await install({
-    packageRoot,
-    argv: ['--target', workdir],
-    cwd: workdir,
-    stdout,
-    isTTY: true,
-    prompt,
-  });
+  await install({ packageRoot, argv: ['--target', workdir], cwd: workdir, stdout, isTTY: true, prompt });
 
   expect(asked.map((a) => a.name)).toEqual(['assistant', 'scope']);
-  expect(asked[0].choices).toEqual(expect.arrayContaining(['claude', 'agents', 'all']));
-  expect(asked[1].choices).toEqual(expect.arrayContaining(['project', 'global']));
+  expect(asked[0].multi).toBe(true);
+  expect(asked[0].choices).toEqual(expect.arrayContaining(['claude', 'cursor', 'copilot', 'all']));
+  expect((await stat(join(workdir, 'CLAUDE.md'))).isFile()).toBe(true);
+});
 
-  const claudeMd = join(workdir, 'CLAUDE.md');
-  expect((await stat(claudeMd)).isFile()).toBe(true);
+test('install returns a summary of what it wrote', async () => {
+  const stdout = { write: () => {} };
+  const summary = await install({
+    packageRoot, argv: ['--target', workdir, '--yes', '--assistant', 'claude,cursor', '--scope', 'project'],
+    cwd: workdir, stdout, isTTY: false, prompt: async () => {},
+  });
+  expect(summary.scope).toBe('project');
+  expect(summary.entryFiles).toEqual(expect.arrayContaining(['CLAUDE.md', 'AGENTS.md']));
+  expect(summary.labels).toEqual(expect.arrayContaining(['Claude Code', 'Cursor']));
+  expect(summary.skillCount).toBeGreaterThan(0);
 });

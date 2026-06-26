@@ -219,3 +219,45 @@ test('install without --yes on a non-TTY stdin fails with actionable guidance', 
   expect(stderr).toMatch(/--yes/);
   expect(stderr).toMatch(/interactive|TTY/i);
 });
+
+test('install --assistant gemini writes GEMINI.md and the .agents skill tree', async () => {
+  const { code } = await run(['install', '--yes', '--target', workdir, '--assistant', 'gemini', '--scope', 'project']);
+  expect(code).toBe(0);
+  expect((await stat(join(workdir, 'GEMINI.md'))).isFile()).toBe(true);
+  expect((await stat(join(workdir, '.agents', 'skills', 'sast-analysis', 'SKILL.md'))).isFile()).toBe(true);
+  const entries = await readdir(workdir);
+  expect(entries).not.toContain('AGENTS.md');
+});
+
+test('install --assistant copilot writes the nested copilot-instructions path', async () => {
+  const { code } = await run(['install', '--yes', '--target', workdir, '--assistant', 'copilot', '--scope', 'project']);
+  expect(code).toBe(0);
+  const file = join(workdir, '.github', 'copilot-instructions.md');
+  expect((await stat(file)).isFile()).toBe(true);
+  const content = await readFile(file, 'utf8');
+  expect(content).toMatch(/SAST Security Assessment/);
+});
+
+test('install --assistant codex,cursor dedupes to a single AGENTS.md and one .agents tree', async () => {
+  const { code } = await run(['install', '--yes', '--target', workdir, '--assistant', 'codex,cursor', '--scope', 'project']);
+  expect(code).toBe(0);
+  expect((await stat(join(workdir, 'AGENTS.md'))).isFile()).toBe(true);
+  expect((await stat(join(workdir, '.agents', 'skills', 'sast-sqli', 'SKILL.md'))).isFile()).toBe(true);
+});
+
+test('install --assistant all writes both entry families and both skill trees', async () => {
+  const { code } = await run(['install', '--yes', '--target', workdir, '--assistant', 'all', '--scope', 'project']);
+  expect(code).toBe(0);
+  expect((await stat(join(workdir, 'CLAUDE.md'))).isFile()).toBe(true);
+  expect((await stat(join(workdir, 'GEMINI.md'))).isFile()).toBe(true);
+  expect((await stat(join(workdir, '.github', 'copilot-instructions.md'))).isFile()).toBe(true);
+  expect((await stat(join(workdir, '.claude', 'skills', 'sast-analysis', 'SKILL.md'))).isFile()).toBe(true);
+  expect((await stat(join(workdir, '.agents', 'skills', 'sast-analysis', 'SKILL.md'))).isFile()).toBe(true);
+});
+
+test('install rejects an unknown assistant id with a clean message', async () => {
+  const { code, stderr } = await run(['install', '--yes', '--target', workdir, '--assistant', 'bogus', '--scope', 'project']);
+  expect(code).toBe(1);
+  expect(stderr).toMatch(/Unknown assistant: bogus/);
+  expect(stderr).not.toMatch(/install\.js/);
+});

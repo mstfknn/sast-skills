@@ -1,27 +1,21 @@
 import { readdir, copyFile, mkdir, access } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
-
-const ASSISTANT_LAYOUT = {
-  claude: { entryFile: 'CLAUDE.md', skillsDir: '.claude' },
-  agents: { entryFile: 'AGENTS.md', skillsDir: '.agents' },
-};
-
-const VALID_ASSISTANTS = [...Object.keys(ASSISTANT_LAYOUT), 'all'];
-const VALID_SCOPES = ['project', 'global'];
-
-function assistantsFor(choice) {
-  if (choice === 'all') return Object.keys(ASSISTANT_LAYOUT);
-  return [choice];
-}
+import { resolveAgents, ENTRY_SOURCE, validIds } from '../agents.js';
 
 async function exists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
+  try { await access(path); return true; } catch { return false; }
+}
+
+async function copyTree(srcRoot, skillTree, target) {
+  const skillsSrc = resolve(srcRoot, skillTree, 'skills');
+  const skills = await readdir(skillsSrc);
+  for (const name of skills) {
+    const dst = resolve(target, skillTree, 'skills', name, 'SKILL.md');
+    await mkdir(dirname(dst), { recursive: true });
+    await copyFile(resolve(skillsSrc, name, 'SKILL.md'), dst);
   }
+  return skills.length;
 }
 
 export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt }) {
@@ -29,14 +23,14 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
   let dryRun = false;
   let force = false;
   let yes = false;
-  let assistant;
+  let assistantArg;
   let scope;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--target') target = argv[++i];
     else if (argv[i] === '--dry-run') dryRun = true;
     else if (argv[i] === '--force') force = true;
     else if (argv[i] === '--yes') yes = true;
-    else if (argv[i] === '--assistant') assistant = argv[++i];
+    else if (argv[i] === '--assistant') assistantArg = argv[++i];
     else if (argv[i] === '--scope') scope = argv[++i];
   }
 
@@ -44,58 +38,66 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
     throw new Error('Non-interactive stdin detected; pass --yes to run without prompts, or run in an interactive TTY.');
   }
 
+  let selection = assistantArg ? assistantArg.split(',').map((s) => s.trim()).filter(Boolean) : null;
+
   if (!yes && isTTY) {
-    if (assistant === undefined) {
-      assistant = await prompt({ name: 'assistant', choices: VALID_ASSISTANTS });
+    if (selection === null) {
+      selection = await prompt({ name: 'assistant', choices: [...validIds(), 'all'], multi: true });
     }
     if (scope === undefined) {
-      scope = await prompt({ name: 'scope', choices: VALID_SCOPES });
+      scope = await prompt({ name: 'scope', choices: ['project', 'global'] });
     }
   }
 
-  assistant ??= 'claude';
+  if (selection === null || selection.length === 0) selection = ['claude'];
   scope ??= 'project';
 
-  if (!VALID_ASSISTANTS.includes(assistant)) {
-    throw new Error(`Invalid --assistant value: ${assistant}. Expected one of: ${VALID_ASSISTANTS.join(', ')}.`);
-  }
-  if (!VALID_SCOPES.includes(scope)) {
-    throw new Error(`Invalid --scope value: ${scope}. Expected one of: ${VALID_SCOPES.join(', ')}.`);
+  if (!['project', 'global'].includes(scope)) {
+    throw new Error(`Invalid --scope value: ${scope}. Expected one of: project, global.`);
   }
 
-  // An explicit --target always wins. Otherwise the scope decides where skills
-  // land: global installs into the user's home (~/.claude/skills), project into cwd.
-  target ??= scope === 'global' ? homedir() : cwd;
-
+  let agents;
+  try {
+    agents = resolveAgents(selection);
+  } catch (err) {
+    throw new Error(`Invalid --assistant value: ${err.message}`);
+  }
   const srcRoot = resolve(packageRoot, 'sast-files');
+  if (target === undefined) target = scope === 'global' ? homedir() : cwd;
 
-  for (const a of assistantsFor(assistant)) {
-    const { entryFile, skillsDir } = ASSISTANT_LAYOUT[a];
-    const skillsSrc = resolve(srcRoot, skillsDir, 'skills');
-    const skills = await readdir(skillsSrc);
+  const entryFiles = [...new Map(agents.map((a) => [a.entryFile, a])).values()];
+  const skillTrees = [...new Set(agents.map((a) => a.skillTree))];
 
-    if (dryRun) {
-      stdout.write(`${entryFile}\n`);
-      for (const name of skills) {
-        stdout.write(`${skillsDir}/skills/${name}/SKILL.md\n`);
+  if (dryRun) {
+    if (scope !== 'global') for (const a of entryFiles) stdout.write(`${a.entryFile}\n`);
+    for (const tree of skillTrees) {
+      for (const name of await readdir(resolve(srcRoot, tree, 'skills'))) {
+        stdout.write(`${tree}/skills/${name}/SKILL.md\n`);
       }
-      continue;
     }
+    return;
+  }
 
-    if (scope !== 'global') {
-      const entryDst = resolve(target, entryFile);
+  if (scope !== 'global') {
+    for (const a of entryFiles) {
+      const entryDst = resolve(target, a.entryFile);
       if (!force && await exists(entryDst)) {
-        const err = new Error(`${entryFile} already exists in target. Run "sast-skills update" to refresh an existing install, or pass --force to overwrite.`);
+        const err = new Error(`${a.entryFile} already exists in target. Run "sast-skills update" to refresh an existing install, or pass --force to overwrite.`);
         err.code = 'EEXIST';
         throw err;
       }
-      await copyFile(resolve(srcRoot, entryFile), entryDst);
-    }
-
-    for (const name of skills) {
-      const dst = resolve(target, skillsDir, 'skills', name, 'SKILL.md');
-      await mkdir(dirname(dst), { recursive: true });
-      await copyFile(resolve(skillsSrc, name, 'SKILL.md'), dst);
+      await mkdir(dirname(entryDst), { recursive: true });
+      await copyFile(resolve(srcRoot, ENTRY_SOURCE[a.skillTree]), entryDst);
     }
   }
+
+  let skillCount = 0;
+  for (const tree of skillTrees) skillCount = await copyTree(srcRoot, tree, target);
+
+  return {
+    scope,
+    labels: agents.map((a) => a.label),
+    entryFiles: entryFiles.map((a) => a.entryFile),
+    skillCount,
+  };
 }
