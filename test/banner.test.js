@@ -8,6 +8,10 @@ test('banner includes the name, repo URL, and version', () => {
   expect(out).toMatch(/9\.9\.9/);
 });
 
+test('banner renders the block ASCII wordmark', () => {
+  expect(BANNER('1.2.3')).toMatch(/█/);
+});
+
 test('summaryText reports the assistants, files, and skill count', () => {
   const out = summaryText({ scope: 'project', labels: ['Claude Code', 'Cursor'], entryFiles: ['CLAUDE.md', 'AGENTS.md'], skillCount: 31 });
   expect(out).toMatch(/2 assistant/);
