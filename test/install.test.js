@@ -141,6 +141,21 @@ test('install --force overwrites an existing CLAUDE.md', async () => {
   expect(after).toMatch(/SAST Security Assessment/);
 });
 
+test('re-installing an already-installed project guides to `update` without a raw stack trace', async () => {
+  // A prior install left the orchestrator entry file in place.
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'claude', '--scope', 'project']);
+
+  const { code, stderr } = await run([
+    'install', '--yes', '--target', workdir, '--assistant', 'claude', '--scope', 'project',
+  ]);
+  expect(code).toBe(1);
+  expect(stderr).toMatch(/CLAUDE\.md.*exist/i); // still says what is blocking
+  expect(stderr).toMatch(/\bupdate\b/);         // points the user at the update command
+  // No raw Node stack trace — just the actionable message.
+  expect(stderr).not.toMatch(/install\.js/);
+  expect(stderr).not.toMatch(/\n\s+at /);
+});
+
 test('install --scope global writes skills under $HOME, not cwd, and skips the entry file', async () => {
   const home = await mkdtemp(join(tmpdir(), 'sast-skills-home-'));
   try {

@@ -85,7 +85,7 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
     if (scope !== 'global') {
       const entryDst = resolve(target, entryFile);
       if (!force && await exists(entryDst)) {
-        const err = new Error(`${entryFile} already exists in target; use --force to overwrite`);
+        const err = new Error(`${entryFile} already exists in target. Run "sast-skills update" to refresh an existing install, or pass --force to overwrite.`);
         err.code = 'EEXIST';
         throw err;
       }

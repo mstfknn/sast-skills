@@ -26,14 +26,21 @@ if (command === '--version') {
     '  --version    Print the installed version',
   ].join('\n'));
 } else if (command === 'install' || command === 'uninstall' || command === 'update' || command === 'doctor' || command === 'export') {
-  await run({
-    argv: [command, ...rest],
-    cwd: process.cwd(),
-    packageRoot,
-    stdin: process.stdin,
-    stdout: process.stdout,
-    stderr: process.stderr,
-  });
+  try {
+    await run({
+      argv: [command, ...rest],
+      cwd: process.cwd(),
+      packageRoot,
+      stdin: process.stdin,
+      stdout: process.stdout,
+      stderr: process.stderr,
+    });
+  } catch (err) {
+    // Operational errors (validation, refusing to clobber, doctor findings)
+    // should read as a clean, actionable line — not a Node stack trace.
+    console.error(err?.message ?? err);
+    process.exit(1);
+  }
 } else {
   console.error('Unknown command');
   process.exit(1);

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The CLI prints a clean, actionable one-line message instead of a Node stack trace when a command fails. Re-running `install` on an already-installed project now points to `sast-skills update` (and still refuses to clobber an existing entry file without `--force`).
+
 ## [0.1.2] — 2026-06-26
 
 ### Changed
