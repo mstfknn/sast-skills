@@ -1,10 +1,6 @@
 import { rm, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-
-const ASSISTANT_LAYOUT = {
-  claude: { entryFile: 'CLAUDE.md', skillsDir: '.claude' },
-  agents: { entryFile: 'AGENTS.md', skillsDir: '.agents' },
-};
+import { AGENTS, ENTRY_SOURCE } from '../agents.js';
 
 async function readIfExists(path) {
   try {
@@ -24,17 +20,19 @@ export async function uninstall({ argv, cwd, packageRoot }) {
     else if (argv[i] === '--force') force = true;
   }
 
-  const { entryFile, skillsDir } = ASSISTANT_LAYOUT[assistant];
+  const agent = AGENTS.find((a) => a.id === assistant);
+  if (!agent) throw new Error(`Unknown assistant: ${assistant}.`);
+  const { entryFile, skillTree } = agent;
   const entryDst = resolve(target, entryFile);
 
   if (!force) {
-    const installedContent = await readIfExists(entryDst);
-    const bundledContent = await readIfExists(resolve(packageRoot, 'sast-files', entryFile));
-    if (installedContent !== null && bundledContent !== null && installedContent !== bundledContent) {
+    const installed = await readIfExists(entryDst);
+    const bundled = await readIfExists(resolve(packageRoot, 'sast-files', ENTRY_SOURCE[skillTree]));
+    if (installed !== null && bundled !== null && installed !== bundled) {
       throw new Error(`${entryFile} has been modified; pass --force to remove it anyway.`);
     }
   }
 
   await rm(entryDst, { force: true });
-  await rm(resolve(target, skillsDir, 'skills'), { recursive: true, force: true });
+  await rm(resolve(target, skillTree, 'skills'), { recursive: true, force: true });
 }

@@ -58,3 +58,12 @@ test('uninstall preserves a user-modified CLAUDE.md unless --force is passed', a
   const after = await readFile(join(workdir, 'CLAUDE.md'), 'utf8');
   expect(after).toBe(modified);
 });
+
+test('uninstall removes a cursor (AGENTS.md/.agents) install', async () => {
+  const { access } = await import('node:fs/promises');
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'cursor', '--scope', 'project']);
+  const { code } = await run(['uninstall', '--target', workdir, '--assistant', 'cursor', '--force']);
+  expect(code).toBe(0);
+  await expect(access(join(workdir, 'AGENTS.md'))).rejects.toBeTruthy();
+  await expect(access(join(workdir, '.agents', 'skills'))).rejects.toBeTruthy();
+});
