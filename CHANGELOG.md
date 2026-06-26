@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-06-26
+
+### Fixed
+
+- The interactive install picker now shows each assistant's official name (e.g. "Gemini CLI", not `gemini`) with a "space to select · enter to confirm" hint, and requires at least one selection — so pressing enter without toggling no longer submits an empty list and errors with "No assistants selected".
+- `update` now prints a "Refreshed …" summary on success; it previously refreshed silently and looked like it did nothing.
+
+### Added
+
+- The install picker probes your PATH for CLI-primary assistants (Claude Code, Codex, Gemini, OpenCode, Aider, Hermes, Augment) and disables the ones that aren't installed, so you pick what you actually have. Assistants without a dependable probe (Cursor, Windsurf, Copilot, Cline, Kilo Code, Antigravity, Mistral Vibe) stay selectable.
+
 ## [0.2.0] — 2026-06-26
 
 ### Added
@@ -101,7 +112,8 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/mstfknn/sast-skills/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/mstfknn/sast-skills/compare/v0.1.5...v0.2.0
 [0.1.5]: https://github.com/mstfknn/sast-skills/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/mstfknn/sast-skills/compare/v0.1.3...v0.1.4
