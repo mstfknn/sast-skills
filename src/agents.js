@@ -1,17 +1,22 @@
+// `cli` is set only for CLI-primary assistants whose absence from PATH reliably
+// means "not installed" — used to disable them in the interactive picker. App-
+// and editor-extension assistants (Cursor, Windsurf, Copilot, Cline, Kilo Code,
+// Antigravity) have no dependable PATH probe, so they carry no `cli` and stay
+// selectable. `label` uses each tool's official name.
 export const AGENTS = [
-  { id: 'claude', label: 'Claude Code', entryFile: 'CLAUDE.md', skillTree: '.claude' },
-  { id: 'codex', label: 'OpenAI Codex (CLI)', entryFile: 'AGENTS.md', skillTree: '.agents' },
-  { id: 'gemini', label: 'Gemini CLI', entryFile: 'GEMINI.md', skillTree: '.agents' },
+  { id: 'claude', label: 'Claude Code', entryFile: 'CLAUDE.md', skillTree: '.claude', cli: 'claude' },
+  { id: 'codex', label: 'OpenAI Codex CLI', entryFile: 'AGENTS.md', skillTree: '.agents', cli: 'codex' },
+  { id: 'gemini', label: 'Gemini CLI', entryFile: 'GEMINI.md', skillTree: '.agents', cli: 'gemini' },
   { id: 'copilot', label: 'GitHub Copilot', entryFile: '.github/copilot-instructions.md', skillTree: '.agents' },
   { id: 'cursor', label: 'Cursor', entryFile: 'AGENTS.md', skillTree: '.agents' },
   { id: 'windsurf', label: 'Windsurf', entryFile: '.windsurf/rules/sast-skills.md', skillTree: '.agents' },
-  { id: 'opencode', label: 'OpenCode', entryFile: 'AGENTS.md', skillTree: '.agents' },
+  { id: 'opencode', label: 'OpenCode', entryFile: 'AGENTS.md', skillTree: '.agents', cli: 'opencode' },
   { id: 'cline', label: 'Cline', entryFile: '.clinerules/sast-skills.md', skillTree: '.agents' },
   { id: 'antigravity', label: 'Antigravity', entryFile: 'AGENTS.md', skillTree: '.agents' },
-  { id: 'aider', label: 'Aider', entryFile: 'CONVENTIONS.md', skillTree: '.agents' },
+  { id: 'aider', label: 'Aider', entryFile: 'CONVENTIONS.md', skillTree: '.agents', cli: 'aider' },
   { id: 'kilocode', label: 'Kilo Code', entryFile: 'AGENTS.md', skillTree: '.agents' },
-  { id: 'augment', label: 'Augment', entryFile: 'AGENTS.md', skillTree: '.agents' },
-  { id: 'hermes', label: 'Hermes Agent', entryFile: 'AGENTS.md', skillTree: '.agents' },
+  { id: 'augment', label: 'Augment Code', entryFile: 'AGENTS.md', skillTree: '.agents', cli: 'auggie' },
+  { id: 'hermes', label: 'Hermes Agent', entryFile: 'AGENTS.md', skillTree: '.agents', cli: 'hermes' },
   { id: 'mistralvibe', label: 'Mistral Vibe', entryFile: 'AGENTS.md', skillTree: '.agents' },
 ];
 

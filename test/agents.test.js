@@ -48,3 +48,13 @@ test('agentById returns the agent, resolves the agents alias, and null for unkno
   expect(agentById('agents')).toMatchObject({ entryFile: 'AGENTS.md', skillTree: '.agents' });
   expect(agentById('nope')).toBeNull();
 });
+
+test('CLI-primary agents carry a cli probe; editor/app-only agents do not', () => {
+  const byId = Object.fromEntries(AGENTS.map((a) => [a.id, a]));
+  expect(byId.claude.cli).toBe('claude');
+  expect(byId.gemini.cli).toBe('gemini');
+  expect(byId.aider.cli).toBe('aider');
+  expect(byId.copilot.cli).toBeUndefined();
+  expect(byId.cline.cli).toBeUndefined();
+  expect(byId.antigravity.cli).toBeUndefined();
+});

@@ -1,5 +1,5 @@
 import { test, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, rm, stat } from 'node:fs/promises';
+import { mkdtemp, rm, stat, writeFile, chmod } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -53,4 +53,28 @@ test('install errors on an empty assistant selection instead of silently default
   await expect(
     install({ packageRoot, argv: ['--target', workdir], cwd: workdir, stdout, isTTY: true, prompt }),
   ).rejects.toThrow(/No assistants selected/i);
+});
+
+test('install disables undetected CLI assistants and keeps undetectable ones selectable', async () => {
+  const bindir = await mkdtemp(join(tmpdir(), 'sast-bin-'));
+  const gemini = join(bindir, 'gemini');
+  await writeFile(gemini, '#!/bin/sh\n');
+  await chmod(gemini, 0o755);
+  const savedPath = process.env.PATH;
+  process.env.PATH = bindir;
+  try {
+    let captured;
+    const prompt = async ({ name, choices }) => {
+      if (name === 'assistant') { captured = choices; return ['gemini']; }
+      return 'project';
+    };
+    await install({ packageRoot, argv: ['--target', workdir], cwd: workdir, stdout: { write() {} }, isTTY: true, prompt });
+    const byId = Object.fromEntries(captured.filter((c) => c.value !== 'all').map((c) => [c.value, c]));
+    expect(byId.gemini.disabled).toBeFalsy();  // found on PATH → selectable
+    expect(byId.codex.disabled).toBe(true);    // cli, absent from PATH → disabled
+    expect(byId.cline.disabled).toBeFalsy();   // no cli probe → always selectable
+  } finally {
+    process.env.PATH = savedPath;
+    await rm(bindir, { recursive: true, force: true });
+  }
 });

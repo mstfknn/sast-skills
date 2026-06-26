@@ -2,6 +2,7 @@ import { readdir, copyFile, mkdir, access } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { resolveAgents, ENTRY_SOURCE, AGENTS } from '../agents.js';
+import { installedIds } from '../detect.js';
 
 async function exists(path) {
   try { await access(path); return true; } catch { return false; }
@@ -42,13 +43,23 @@ export async function install({ packageRoot, argv, cwd, stdout, isTTY, prompt })
 
   if (!yes && isTTY) {
     if (selection === null) {
+      // Disable assistants we can reliably probe (have a `cli`) but did not find
+      // on PATH. Assistants without a probe stay selectable rather than be wrongly
+      // greyed out.
+      const installed = await installedIds(AGENTS);
+      const choices = AGENTS.map((a) => {
+        const choice = { value: a.id, label: a.label };
+        if (a.cli && !installed.has(a.id)) {
+          choice.disabled = true;
+          choice.hint = 'not detected';
+        }
+        return choice;
+      });
+      choices.push({ value: 'all', label: '✨ All of the above' });
       selection = await prompt({
         name: 'assistant',
         message: 'Which assistants should sast-skills install for?  (↑↓ move · space to select · enter to confirm)',
-        choices: [
-          ...AGENTS.map((a) => ({ value: a.id, label: a.label })),
-          { value: 'all', label: '✨ All of the above' },
-        ],
+        choices,
         multi: true,
       });
     }
