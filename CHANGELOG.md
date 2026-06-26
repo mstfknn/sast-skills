@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-06-26
+
+### Fixed
+
+- `install --scope global` now writes skills under `~/.claude/skills` instead of the current working directory. Global scope previously only skipped copying the `CLAUDE.md` / `AGENTS.md` entry file but still installed the skill tree into the cwd, so selecting "global" silently behaved like a project install.
+
+### Changed
+
+- Bumped CI actions to current majors (`actions/checkout@v7`, `actions/setup-node@v6`) — the prior `@v4` pins targeted the now-deprecated Node 20 action runtime.
+- `register-skill` is now idempotent: re-registering an existing skill no longer appends duplicate skip lines or table rows to `CLAUDE.md` / `AGENTS.md` / `README.md`.
+
 ## [0.1.0] — 2026-04-21
 
 Initial public release.
@@ -50,5 +61,6 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/mstfknn/sast-skills/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mstfknn/sast-skills/releases/tag/v0.1.0
