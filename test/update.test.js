@@ -33,6 +33,27 @@ afterEach(async () => {
   await rm(workdir, { recursive: true, force: true });
 });
 
+test('update with no --assistant auto-detects an existing install and refreshes it', async () => {
+  await run(['install', '--yes', '--target', workdir, '--assistant', 'gemini', '--scope', 'project']);
+  const skill = join(workdir, '.agents', 'skills', 'sast-sqli', 'SKILL.md');
+  await writeFile(skill, 'outdated');
+
+  const { code } = await run(['update', '--yes', '--target', workdir]);
+  expect(code).toBe(0);
+  const refreshed = await (await import('node:fs/promises')).readFile(skill, 'utf8');
+  expect(refreshed).not.toBe('outdated');
+  expect((await stat(join(workdir, 'GEMINI.md'))).isFile()).toBe(true);
+});
+
+test('update leaves a non-ours entry file untouched and reports nothing to update', async () => {
+  await writeFile(join(workdir, 'AGENTS.md'), 'my own agents file');
+  const { code, stdout, stderr } = await run(['update', '--yes', '--target', workdir]);
+  expect(code).not.toBe(0);
+  expect(`${stdout}${stderr}`).toMatch(/No sast-skills install found/i);
+  const after = await (await import('node:fs/promises')).readFile(join(workdir, 'AGENTS.md'), 'utf8');
+  expect(after).toBe('my own agents file');
+});
+
 test('update restores missing skill files and refreshes stale ones', async () => {
   await run(['install', '--yes', '--target', workdir, '--assistant', 'claude', '--scope', 'project']);
 
