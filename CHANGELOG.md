@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-06-26
+
+### Added
+
+- **14-assistant install.** `npx sast-skills install` now supports Claude Code, OpenAI Codex (CLI), Gemini CLI, GitHub Copilot, Cursor, Windsurf, OpenCode, Cline, Antigravity, Aider, Kilo Code, Augment, Hermes Agent, and Mistral Vibe — via an interactive multi-select (with an "All of the above" option) and a comma-separated `--assistant claude,cursor,copilot` flag. Each assistant gets the orchestrator written to its own convention's path (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.github/copilot-instructions.md`, `.windsurf/rules/sast-skills.md`, `.clinerules/sast-skills.md`, `CONVENTIONS.md`) plus the matching skill tree, deduped across shared paths.
+- An ASCII banner and a post-install summary (with an Aider `--read CONVENTIONS.md` hint) on interactive install.
+
+### Changed
+
+- `update` auto-detects an existing install (by orchestrator signature) and refreshes only what is present, without clobbering a user-authored entry file. `doctor` and `uninstall` are registry-aware and accept any assistant id (and the legacy `agents` alias).
+- `--assistant` accepts a comma-separated id list; the legacy `claude` / `agents` / `all` values still work.
+
 ## [0.1.5] — 2026-06-26
 
 ### Security
@@ -89,7 +101,8 @@ Initial public release.
 - Skill body prose is LLM-generated security guidance — production-grade, but detection quality depends on the model running the scan; complement with dedicated scanners (Semgrep, CodeQL, OSV-Scanner) where available.
 - Paket sast-files tree'i hem `.claude/skills` hem `.agents/skills` altında taşır (mirror); paket boyutunu küçültmek ileriki sürümde hedeftir.
 
-[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/mstfknn/sast-skills/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/mstfknn/sast-skills/compare/v0.1.5...v0.2.0
 [0.1.5]: https://github.com/mstfknn/sast-skills/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/mstfknn/sast-skills/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/mstfknn/sast-skills/compare/v0.1.2...v0.1.3
