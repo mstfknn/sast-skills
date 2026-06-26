@@ -28,6 +28,8 @@ npm run sync                          # mirror .claude/skills → .agents/skills
 npm run lint:md                       # markdownlint-cli2 over markdown
 
 # CLI under development (same entry the published bin exposes):
+node bin/sast-skills.js install --yes --assistant claude,cursor --scope project
+node bin/sast-skills.js update --yes --target .
 node bin/sast-skills.js doctor --target . --assistant claude
 node bin/sast-skills.js export --input sast/ --format sarif --output report.sarif
 
@@ -42,20 +44,35 @@ JS with JSDoc-free ESM; do not introduce a TypeScript or bundler step.
 
 ## Architecture
 
-### The CLI (`src/cli.js`)
+### The CLI (`src/cli.js`) and the assistant registry
 
-`bin/sast-skills.js` parses `--version`/`--help` and dispatches everything else to
-`run()` in `src/cli.js`, which routes to one of four commands in `src/commands/`:
-`install`, `uninstall`, `doctor`, `export`. `update` is just `install` with `--force`
-appended. Commands take an injected `{ argv, cwd, packageRoot, stdout, stdin, prompt }`
-bag — there are **no direct reads of `process`/`console` inside `src/`**, which is what
-makes them unit-testable. Interactive prompts go through `src/prompts/clack.js` (a thin
-`@clack/prompts` wrapper) and are also injected, so tests pass a fake.
+`bin/sast-skills.js` parses `--version`/`--help` (and prints the ASCII banner from
+`src/banner.js` before an interactive install/update), then dispatches to `run()` in
+`src/cli.js`, which routes to one of **five** commands in `src/commands/`: `install`,
+`update`, `uninstall`, `doctor`, `export`. Commands take an injected
+`{ argv, cwd, packageRoot, stdout, stdin, prompt }` bag — there are **no direct reads of
+`process`/`console` inside `src/`**, which is what makes them unit-testable. Interactive
+prompts go through `src/prompts/clack.js` (a thin `@clack/prompts` wrapper), injected so
+tests pass a fake.
 
-`install` copies the orchestrator entry file (`CLAUDE.md`/`AGENTS.md`) to the project root
-and each `SKILL.md` into `.claude/skills/<name>/` or `.agents/skills/<name>/`, driven by the
-`ASSISTANT_LAYOUT` map. `export` reads canonical `sast/*-results.json` findings and renders
-JSON / SARIF 2.1.0 / HTML (`--triaged` prefers `sast/triaged.json`).
+**`src/agents.js` is the single source of truth** for supported assistants — a 14-entry
+`AGENTS` registry (`{ id, label, entryFile, skillTree, cli? }`) plus `resolveAgents()`
+(expands the `all` / legacy `agents` aliases, dedupes), `agentById()`, and `ENTRY_SOURCE`
+(`.claude`→`CLAUDE.md`, `.agents`→`AGENTS.md`). `install` / `update` / `doctor` / `uninstall`
+all consume it. There is no more `ASSISTANT_LAYOUT`.
+
+- **`install`** resolves a selection (comma-list `--assistant claude,cursor,copilot`, or
+  `all`, or an interactive multiselect) to a **deduped** set of entry files + skill trees, and
+  writes each assistant's orchestrator to its own convention's path (`CLAUDE.md`, `AGENTS.md`,
+  `GEMINI.md`, `.github/copilot-instructions.md`, `.windsurf/rules/sast-skills.md`,
+  `.clinerules/sast-skills.md`, `CONVENTIONS.md`) plus the matching tree. It refuses to clobber
+  an existing entry file without `--force`. The interactive picker uses `src/detect.js` (a
+  dependency-free PATH scan) to disable CLI-primary assistants not found on PATH.
+- **`update`** (its own command, `src/commands/update.js`) auto-detects an existing install by
+  the orchestrator signature and refreshes only what's present, never clobbering a user-authored
+  file; with `--assistant` it delegates to `install --force`.
+- **`export`** reads canonical `sast/*-results.json` findings → JSON / SARIF 2.1.0 / HTML
+  (`--triaged` prefers `sast/triaged.json`); the run version is stamped from `package.json`.
 
 ### The skill bundle (`sast-files/`)
 
@@ -108,3 +125,7 @@ orchestrator and in the README under "Finding schema".
 - Keep `src/` side-effect-free and dependency-injected; route I/O through the passed-in bag.
 - Idempotency is a product promise: `install`/`update`/`export` and the orchestrator's
   per-skill skip rules must be safely re-runnable.
+- Releasing: bump `package.json` `version`, add a `CHANGELOG.md` entry, then push a `vX.Y.Z`
+  tag. `.github/workflows/publish.yml` runs the test job, then publishes to npm via **OIDC
+  trusted publishing** (no `NPM_TOKEN`) with provenance. Pushes to `main` auto-refresh a
+  test-count badge on the `badges` branch.
