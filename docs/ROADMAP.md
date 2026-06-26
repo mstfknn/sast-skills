@@ -25,8 +25,11 @@ Frameworks: `Web25` OWASP Top 10:2025 · `API23` API Security Top 10:2023 ·
 Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 
 - [Milestone 0 — Infra](roadmap/milestone-0-infra.md) (schema v2 · router · framework profiles)
-- [Milestone 1 — Tier A](roadmap/milestone-1.md) (format + first worked skill)
-- Milestones 2–4 + Backlog — to follow, same format.
+- [Milestone 1 — Tier A](roadmap/milestone-1.md) (13 skills)
+- [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills)
+- [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills)
+- [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills)
+- [Backlog](roadmap/milestone-backlog.md) (6 skills)
 
 ## Milestone 0 — Infra first (do before mass skill authoring)
 
