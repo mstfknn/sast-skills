@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Updated dependencies to clear all 27 osv-scanner advisories (all dev-only/transitive). Bumped the runtime dependency `@clack/prompts` to `^1.6.0`, `vitest` to `^4.1.9`, and `markdownlint-cli2` to `^0.22.1`, and pinned fixed versions of vulnerable transitive dev deps (hono, vite, uuid, fast-uri, @anthropic-ai/sdk, js-yaml, markdown-it, smol-toml, qs, ip-address, brace-expansion) via `overrides`. `osv-scanner`: no issues found; `npm audit`: 0.
+
 ## [0.1.4] — 2026-06-26
 
 ### Fixed
