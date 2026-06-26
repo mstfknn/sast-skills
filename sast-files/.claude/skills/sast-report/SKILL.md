@@ -98,7 +98,10 @@ Read each existing result file. For every finding classified as `[VULNERABLE]` o
 Assign each finding a severity level (Critical / High / Medium / Low) using the table above. Sort all findings:
 
 1. Critical first, then High, Medium, Low
-2. Within each tier, sort by confidentiality impact (highest first)
+2. Within each tier, sort by `exploitability` (`reachable` before `conditional` before `unreachable`/`unknown`) when the field is present
+3. Then by confidentiality impact (highest first)
+
+If a finding carries `exploitability: unreachable`, prefer to down-rank it (or flag it for triage) — it is unlikely to be a true positive.
 
 ### Step 4: Write `sast/final-report.md`
 

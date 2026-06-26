@@ -55,6 +55,7 @@ Run **after** `sast/final-report.md` exists and **before** any remediation work 
 - `triage_original_severity` is set only when severity was changed.
 - `triage_evidence` is **required** for any status other than `confirmed` — it cites concrete code locations, config, or tests that justify the decision.
 - Drop nothing: a false positive stays in the output with `triage_status: "false_positive"` so the decision is auditable.
+- Keep the schema-v2 `exploitability` field consistent with your decision: `false_positive` should usually carry `exploitability: "unreachable"`, and `confirmed` should carry `"reachable"` (or `"conditional"`). Set or correct `exploitability` / `confidence` as part of triage when a skill left them `unknown`.
 
 ## Three-phase approach
 
