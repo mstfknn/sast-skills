@@ -100,13 +100,18 @@ Each JSON file must contain a single object with a `findings` array. Each findin
       "title": "short one-line description",
       "description": "full explanation including exploitability",
       "location": { "file": "relative/path.ext", "line": 123, "column": 10 },
-      "remediation": "how to fix"
+      "remediation": "how to fix",
+      "exploitability": "reachable|conditional|unreachable|unknown",
+      "confidence": "high|medium|low",
+      "chain_id": null
     }
   ]
 }
 ```
 
 If a skill produces no findings, still write the file with `"findings": []` so the aggregator can verify the scan ran.
+
+`exploitability` (is the sink reachable from untrusted input?), `confidence`, and `chain_id` (a stable id shared by findings that compose into one attack) are **schema v2** fields — set them when your verify phase can; they are optional. `sast-skills export` stamps the aggregated output with `"run": { ..., "schema": "2.0" }`.
 
 ---
 

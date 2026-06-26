@@ -34,6 +34,15 @@ test('CLAUDE.md defines a Step 4 triage phase that produces final-report-triaged
   expect(content).toMatch(/Skip.*final-report-triaged\.md/i);
 });
 
+test('both orchestrators document the schema-v2 finding fields', async () => {
+  for (const file of ['CLAUDE.md', 'AGENTS.md']) {
+    const content = await readFile(resolve(repoRoot, 'sast-files', file), 'utf8');
+    expect(content).toMatch(/"exploitability"/);
+    expect(content).toMatch(/"confidence"/);
+    expect(content).toMatch(/"chain_id"/);
+  }
+});
+
 test('AGENTS.md defines a Step 4 triage phase that produces final-report-triaged.md', async () => {
   const content = await readFile(resolve(repoRoot, 'sast-files', 'AGENTS.md'), 'utf8');
   expect(content).toMatch(/## Step 4/);
