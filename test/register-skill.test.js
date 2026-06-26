@@ -34,11 +34,25 @@ beforeEach(async () => {
     '## Step 3: Report Generation',
   ].join('\n'));
 
+  // Mirror the real README: backtick'd rows, a meta "Recon & synthesis" table
+  // followed by detection-class tables, and a trailing section after them.
   await writeFile(join(workdir, 'README.md'), [
+    '#### Recon & synthesis',
+    '',
+    '| Skill | Role |',
+    '|---|---|',
+    '| `sast-analysis` | Codebase recon |',
+    '| `sast-report` | Consolidated final report ranked by severity |',
+    '| `sast-triage` | Remove false positives |',
+    '',
+    '#### Injection',
+    '',
     '| Skill | Vulnerability Class |',
     '|---|---|',
-    '| sast-sqli | SQL Injection |',
-    '| sast-report | Consolidated final report ranked by severity |',
+    '| `sast-sqli` | SQL Injection |',
+    '| `sast-xss` | Cross-Site Scripting |',
+    '',
+    '## License',
   ].join('\n'));
 });
 
@@ -68,14 +82,15 @@ test('registerSkill patches AGENTS.md with a skip line and a table row for the n
   expect(agents).toMatch(/\| sast-csrf \| `sast\/csrf-results\.md`/);
 });
 
-test('registerSkill adds the skill to README before the sast-report row', async () => {
+test('registerSkill adds the skill to a detection table after the meta table, never orphaned after a trailing section', async () => {
   await registerSkill({ ...FIXTURE, repoRoot: workdir });
   const readme = await readFile(join(workdir, 'README.md'), 'utf8');
-  expect(readme).toMatch(/\| sast-csrf \| Cross-Site Request Forgery \|/);
-  const csrfIdx = readme.indexOf('| sast-csrf |');
-  const reportIdx = readme.indexOf('| sast-report |');
-  expect(csrfIdx).toBeGreaterThan(-1);
-  expect(csrfIdx).toBeLessThan(reportIdx);
+  expect(readme).toMatch(/\| `sast-csrf` \| Cross-Site Request Forgery \|/);
+  const csrfIdx = readme.indexOf('| `sast-csrf` |');
+  const reportIdx = readme.indexOf('| `sast-report` |');
+  const licenseIdx = readme.indexOf('## License');
+  expect(csrfIdx).toBeGreaterThan(reportIdx); // not dropped into the meta "Recon & synthesis" table
+  expect(csrfIdx).toBeLessThan(licenseIdx); // inside a real table, not appended past the last section
 });
 
 test('scripts/register-skill.js is callable as a CLI via argv positional arguments', async () => {
@@ -112,7 +127,7 @@ test('registerSkill is idempotent — running twice does not duplicate skip line
     expect(count(doc, 'Skip CSRF if `sast/csrf-results.md` already exists.')).toBe(1);
     expect(count(doc, '| sast-csrf | `sast/csrf-results.md`')).toBe(1);
   }
-  expect(count(readme, '| sast-csrf | Cross-Site Request Forgery |')).toBe(1);
+  expect(count(readme, '| `sast-csrf` | Cross-Site Request Forgery |')).toBe(1);
 });
 
 test('registerSkill uses the name/label/description/resultsBasename args — not hard-coded CSRF', async () => {
@@ -130,5 +145,5 @@ test('registerSkill uses the name/label/description/resultsBasename args — not
   expect(claude).not.toMatch(/CSRF/);
 
   const readme = await readFile(join(workdir, 'README.md'), 'utf8');
-  expect(readme).toMatch(/\| sast-openredirect \| Open redirect bugs \|/);
+  expect(readme).toMatch(/\| `sast-openredirect` \| Open redirect bugs \|/);
 });

@@ -27,11 +27,22 @@ function patchOrchestrator(content, { name, resultsBasename, label }) {
 }
 
 function patchReadme(content, { name, description }) {
-  const row = `| ${name} | ${description} |`;
+  const row = `| \`${name}\` | ${description} |`;
   const lines = content.split('\n');
-  if (lines.includes(row)) return content;
-  const reportIdx = lines.findIndex((l) => l.startsWith('| sast-report'));
-  lines.splice(reportIdx, 0, row);
+  // Idempotent across the backtick'd table format and any legacy plain row.
+  if (lines.some((l) => l.includes(`\`${name}\``) || l.startsWith(`| ${name} |`))) return content;
+  // Detection-skill rows render as "| `sast-…` | … |". Anchor on the LAST such
+  // row so the new entry lands at the end of the final detection-class table —
+  // always inside a real table, never orphaned past a trailing section. Which
+  // category a skill belongs to is editorial and left to the author to refine.
+  let lastRow = -1;
+  lines.forEach((line, i) => {
+    if (/^\|\s*`sast-[a-z0-9]+`\s*\|/.test(line)) lastRow = i;
+  });
+  if (lastRow === -1) {
+    throw new Error('patchReadme: no "| `sast-…` |" table row found — cannot place the new skill row.');
+  }
+  lines.splice(lastRow + 1, 0, row);
   return lines.join('\n');
 }
 
