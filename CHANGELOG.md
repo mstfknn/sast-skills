@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-06-27
+
+### Added
+
+- **Milestone 3 — API & auth depth (7 new skills).** Framework-aware coverage of the authentication and API weaknesses that generic scanners over- or under-flag:
+  - `sast-ratelimit` — missing rate limit on auth / expensive endpoints (CWE-770).
+  - `sast-session` — session fixation and low-entropy session IDs (CWE-384 / CWE-330).
+  - `sast-oauth` — OAuth / OIDC misconfiguration: unvalidated `redirect_uri`, missing `state`, missing PKCE (CWE-601 / CWE-352).
+  - `sast-routeinventory` — shadow / debug / admin routes left registered and unauthenticated (CWE-1059).
+  - `sast-unsafeconsumption` — third-party API responses flowing into a sink without validation, i.e. second-order injection (CWE-20).
+  - `sast-cloudsdk` — cloud SDK misuse: public buckets, hardcoded credentials, over-broad IAM (CWE-732).
+  - `sast-postmessage` — `postMessage` without origin check, cross-site WebSocket hijacking, and reverse-tabnabbing (CWE-346).
+- Totals are now **56 skills across 52 vulnerability classes**.
+
 ## [0.5.0] — 2026-06-26
 
 ### Added
