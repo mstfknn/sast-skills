@@ -67,6 +67,10 @@ Run the detection skills **selected by the router** in `sast/stack.md` — its `
 - Skip Dependency Confusion if `sast/depconfusion-results.md` already exists.
 - Skip Dangerous API if `sast/dangerousapi-results.md` already exists.
 - Skip Cloud Metadata SSRF if `sast/ssrfimds-results.md` already exists.
+- Skip Skill Audit if `sast/skillaudit-results.md` already exists.
+- Skip MCP Security if `sast/mcpsec-results.md` already exists.
+- Skip Config RCE if `sast/configrce-results.md` already exists.
+- Skip Agent Identity if `sast/agentidentity-results.md` already exists.
 
 Start **one subagent per check**, all **in parallel**, each with a dedicated task. Give each subagent the same instruction pattern, using the skill name and paths from the table:
 
@@ -115,6 +119,10 @@ Start **one subagent per check**, all **in parallel**, each with a dedicated tas
 | sast-depconfusion | `sast/depconfusion-results.md` | `sast/depconfusion-recon.md`, `sast/depconfusion-batch-*.md` |
 | sast-dangerousapi | `sast/dangerousapi-results.md` | `sast/dangerousapi-recon.md`, `sast/dangerousapi-batch-*.md` |
 | sast-ssrfimds | `sast/ssrfimds-results.md` | `sast/ssrfimds-recon.md`, `sast/ssrfimds-batch-*.md` |
+| sast-skillaudit | `sast/skillaudit-results.md` | `sast/skillaudit-recon.md`, `sast/skillaudit-batch-*.md` |
+| sast-mcpsec | `sast/mcpsec-results.md` | `sast/mcpsec-recon.md`, `sast/mcpsec-batch-*.md` |
+| sast-configrce | `sast/configrce-results.md` | `sast/configrce-recon.md`, `sast/configrce-batch-*.md` |
+| sast-agentidentity | `sast/agentidentity-results.md` | `sast/agentidentity-recon.md`, `sast/agentidentity-batch-*.md` |
 
 Wait for all subagents to finish before proceeding.
 
