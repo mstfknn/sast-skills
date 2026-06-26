@@ -20,3 +20,10 @@ test('README.md references every bundled skill', async () => {
   const missing = skills.filter((name) => !readme.includes(name));
   expect(missing).toEqual([]);
 });
+
+test('README lists every supported assistant', async () => {
+  const readme = await readFile(resolve(repoRoot, 'README.md'), 'utf8');
+  for (const label of ['Claude Code', 'Codex', 'Gemini', 'Copilot', 'Cursor', 'Windsurf', 'OpenCode', 'Cline', 'Antigravity', 'Aider', 'Kilo Code', 'Augment', 'Hermes', 'Mistral Vibe']) {
+    expect(readme).toContain(label);
+  }
+});

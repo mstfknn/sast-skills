@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/sast-skills.svg?style=flat-square)](https://www.npmjs.com/package/sast-skills) [![CI](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml/badge.svg)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/mstfknn/sast-skills/badges/tests.json&style=flat-square)](https://github.com/mstfknn/sast-skills/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/npm/l/sast-skills.svg?style=flat-square)](LICENSE) [![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
 
-Turn your LLM coding assistant into a fully featured SAST scanner. Drop-in agent skills for Claude Code, Codex, Opencode, Cursor, and any assistant that loads `CLAUDE.md` / `AGENTS.md` skill folders.
+Turn your LLM coding assistant into a fully featured SAST scanner. Drop-in agent skills for **Claude Code, OpenAI Codex (CLI), Gemini CLI, GitHub Copilot, Cursor, Windsurf, OpenCode, Cline, Antigravity, Aider, Kilo Code, Augment, Hermes Agent, and Mistral Vibe**.
 
 > Claude Code with Opus is recommended for quality; any capable model works.
 
@@ -175,11 +175,7 @@ cp "$SAST_SRC/sast-files/AGENTS.md" ./AGENTS.md
 cp -R "$SAST_SRC/sast-files/.agents" ./
 ```
 
-`AGENTS.md` is the cross-assistant convention honored by Gemini CLI, Codex CLI, OpenCode, and Cursor. If your version of Gemini CLI looks for `GEMINI.md` instead, rename it — the content is unchanged:
-
-```bash
-mv AGENTS.md GEMINI.md
-```
+Gemini CLI reads `GEMINI.md`; the installer writes it for you when you pick Gemini.
 
 #### 3. Verify the install
 
@@ -222,7 +218,7 @@ If you keep the clone around, `cd "$SAST_SRC" && git pull && <rerun cp>` is the 
 | Flag | Purpose |
 |---|---|
 | `--yes` | Non-interactive; required when stdin is not a TTY |
-| `--assistant <claude\|agents\|all>` | Which skill tree to install |
+| `--assistant <ids>` | Comma-separated assistant ids (e.g. `claude,cursor,copilot`) or `all` |
 | `--scope <project\|global>` | Install into `./.claude/skills/` or `$HOME/.claude/skills/` |
 | `--target <path>` | Explicit install target (overrides `--scope`) |
 | `--force` | Overwrite a pre-existing `CLAUDE.md` / `AGENTS.md` |
