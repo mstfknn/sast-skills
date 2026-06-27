@@ -46,7 +46,7 @@ It runs all four phases and writes findings to `sast/`. Aggregate them with `npx
 
 ## ✨ Highlights
 
-- **56 skills across 52 vulnerability classes** — injection, broken access control, API & session depth (rate-limiting, OAuth/OIDC, session fixation, shadow routes), weak crypto, file handling, supply chain, CI/CD & cloud-metadata risks, business logic, LLM-specific risks (prompt injection, insecure output handling), and agentic/MCP security (skill-config poisoning, MCP tool poisoning, config-as-execution, over-privileged agent identity), plus a tech-stack router.
+- **62 skills across 58 vulnerability classes** — injection, broken access control, API & session depth (rate-limiting, OAuth/OIDC, session fixation, shadow routes), weak crypto, file handling, supply chain, CI/CD & cloud-metadata risks, business logic, agentic/MCP security (skill-config poisoning, MCP tool poisoning, config-as-execution, over-privileged agent identity), and LLM/agent runtime (excessive agency, RAG isolation, unsafe tool calling, memory poisoning, denial-of-wallet), plus a tech-stack router.
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
 - **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
 - **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
@@ -63,7 +63,7 @@ The orchestrator executes four phases — reconnaissance, parallel detection, sy
 flowchart TD
     U(["User: Run vulnerability scan"]) --> R{"CLAUDE.md / AGENTS.md orchestrator"}
     R --> S1["Step 1 — sast-analysis<br/>codebase and architecture map"]
-    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>52 skills: recon, batched verify, merge"]
+    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>58 skills: recon, batched verify, merge"]
     S2 -->|sast/*-results.md and *-results.json| S3["Step 3 — sast-report<br/>consolidate and rank"]
     S3 -->|sast/final-report.md| S4["Step 4 — sast-triage<br/>false-positive elimination,<br/>severity adjustment with evidence"]
     S4 -->|sast/final-report-triaged.md and triaged.json| EXP["npx sast-skills export<br/>JSON, SARIF, HTML"]
@@ -171,6 +171,19 @@ The 2026-era attack surface most signature scanners miss — natural-language ma
 | `sast-configrce` | Repo config that auto-executes shell at project open / checkout |
 | `sast-agentidentity` | Over-privileged non-human (agent / CI) identity |
 
+### LLM & agent runtime
+
+Runtime behaviour of LLM and agent applications — tool authority, retrieval isolation, prompt-secret hygiene, memory trust, and cost bounds. The tech-stack router gates these so they never run on codebases with no LLM/agent dependencies.
+
+| Skill | Vulnerability Class |
+|---|---|
+| `sast-excessiveagency` | Excessive agent authority (state-changing tools, no human-in-the-loop) |
+| `sast-toolcalling` | LLM tool dispatch without an allow-list / argument validation |
+| `sast-ragleak` | RAG cross-tenant leak + indirect injection (missing retrieval ACL filter) |
+| `sast-systempromptleak` | Secrets in system prompts; prompt logged or echoed to callers |
+| `sast-memorypoison` | Untrusted data persisted to agent memory and later trusted |
+| `sast-llmdos` | Unbounded LLM tokens / agent loops (denial-of-wallet) |
+
 ---
 
 ## 📦 Installation
@@ -206,8 +219,8 @@ Everything you need lives under `sast-skills/sast-files/`:
 sast-files/
 ├── CLAUDE.md                       # Orchestrator entry for Claude Code
 ├── AGENTS.md                       # Orchestrator entry for Gemini CLI / Codex / OpenCode / Cursor
-├── .claude/skills/sast-*/SKILL.md  # 56 skills in Claude Code format
-└── .agents/skills/sast-*/SKILL.md  # Same 56 skills mirrored for AGENTS.md assistants
+├── .claude/skills/sast-*/SKILL.md  # 62 skills in Claude Code format
+└── .agents/skills/sast-*/SKILL.md  # Same 62 skills mirrored for AGENTS.md assistants
 ```
 
 The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.

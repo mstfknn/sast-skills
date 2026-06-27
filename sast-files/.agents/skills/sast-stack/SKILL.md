@@ -58,7 +58,10 @@ verify to suppress framework-default false positives.
 
 **Skip when absent**, for example:
 
-- No LLM/agent SDK → skip every LLM/agentic skill (`sast-promptinjection`, `sast-llmoutput`, …).
+- No LLM/agent SDK → skip every LLM/agent-runtime skill: `sast-promptinjection`,
+  `sast-llmoutput`, `sast-excessiveagency`, `sast-toolcalling`, `sast-ragleak`,
+  `sast-systempromptleak`, `sast-memorypoison`, `sast-llmdos`. Also skip `sast-mcpsec`
+  and `sast-skillaudit` when there is no MCP server / skill-config surface.
 - No JS/TS → skip `sast-prototype`.
 - No XML parsing/serialization → de-prioritize `sast-xxe`.
 - No JWT/session/cookie usage → de-prioritize `sast-jwt`, `sast-cors`, `sast-csrf`.

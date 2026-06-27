@@ -78,6 +78,12 @@ Run the detection skills **selected by the router** in `sast/stack.md` — its `
 - Skip Unsafe Consumption if `sast/unsafeconsumption-results.md` already exists.
 - Skip Cloud SDK if `sast/cloudsdk-results.md` already exists.
 - Skip postMessage Trust if `sast/postmessage-results.md` already exists.
+- Skip Excessive Agency if `sast/excessiveagency-results.md` already exists.
+- Skip RAG Leak if `sast/ragleak-results.md` already exists.
+- Skip System Prompt Leak if `sast/systempromptleak-results.md` already exists.
+- Skip Unsafe Tool Calling if `sast/toolcalling-results.md` already exists.
+- Skip Memory Poisoning if `sast/memorypoison-results.md` already exists.
+- Skip LLM Denial-of-Wallet if `sast/llmdos-results.md` already exists.
 
 Start **one subagent per check**, all **in parallel**, each with a dedicated task. Give each subagent the same instruction pattern, using the skill name and paths from the table:
 
@@ -137,6 +143,12 @@ Start **one subagent per check**, all **in parallel**, each with a dedicated tas
 | sast-unsafeconsumption | `sast/unsafeconsumption-results.md` | `sast/unsafeconsumption-recon.md`, `sast/unsafeconsumption-batch-*.md` |
 | sast-cloudsdk | `sast/cloudsdk-results.md` | `sast/cloudsdk-recon.md`, `sast/cloudsdk-batch-*.md` |
 | sast-postmessage | `sast/postmessage-results.md` | `sast/postmessage-recon.md`, `sast/postmessage-batch-*.md` |
+| sast-excessiveagency | `sast/excessiveagency-results.md` | `sast/excessiveagency-recon.md`, `sast/excessiveagency-batch-*.md` |
+| sast-ragleak | `sast/ragleak-results.md` | `sast/ragleak-recon.md`, `sast/ragleak-batch-*.md` |
+| sast-systempromptleak | `sast/systempromptleak-results.md` | `sast/systempromptleak-recon.md`, `sast/systempromptleak-batch-*.md` |
+| sast-toolcalling | `sast/toolcalling-results.md` | `sast/toolcalling-recon.md`, `sast/toolcalling-batch-*.md` |
+| sast-memorypoison | `sast/memorypoison-results.md` | `sast/memorypoison-recon.md`, `sast/memorypoison-batch-*.md` |
+| sast-llmdos | `sast/llmdos-results.md` | `sast/llmdos-recon.md`, `sast/llmdos-batch-*.md` |
 
 Wait for all subagents to finish before proceeding.
 
