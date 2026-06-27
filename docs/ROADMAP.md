@@ -1,8 +1,13 @@
 # sast-skills Roadmap
 
-Derived from the consolidated skill catalog. Today: **28 shipped skills**. Planned:
-**~35 new detection skills** across 4 milestones plus **6 architecture initiatives**.
-Each skill is mapped to an OWASP framework and a SAST-applicability **tier**:
+> ✅ **Roadmap complete (v0.8.0).** All Milestones 0–4 and the Backlog have shipped — the
+> bundle grew from **28 → 68 skills across 64 vulnerability classes**. The per-milestone
+> sections below are kept as the historical plan with shipped-version markers.
+
+Derived from the consolidated skill catalog. Started at **28 shipped skills**; delivered
+**40 new detection skills** across 4 milestones plus the backlog, and **3 architecture
+initiatives** (schema v2 · tech-stack router · framework profiles). Each skill is mapped to
+an OWASP framework and a SAST-applicability **tier**:
 
 - **A — clean static** (taint / AST / config-match, low false-positive). Reliable; build first.
 - **B — static + framework-awareness** (needs framework defaults or false positives explode).
@@ -29,7 +34,7 @@ Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 - [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills) — ✅ shipped v0.5.0
 - [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills) — ✅ shipped v0.6.0
 - [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills) — ✅ shipped v0.7.0
-- [Backlog](roadmap/milestone-backlog.md) (6 skills)
+- [Backlog](roadmap/milestone-backlog.md) (6 skills) — ✅ shipped v0.8.0
 
 ## Milestone 0 — Infra first (do before mass skill authoring)
 
@@ -110,7 +115,7 @@ This surface is uniquely yours because the product *is* skills. Under active att
 | `sast-lockfile` | lockfile integrity / pinning / unverified source | Web25 A03 | A |
 | `sast-paymentlogic` | e-commerce payment/coupon/wallet/refund abuse | API23 API6 | C |
 
-- [ ] Pull into a milestone when capacity allows. `sast-paymentlogic` is the *only* business-logic split worth making — keep everything else inside `sast-businesslogic` with domain heuristics (the 6-way payment/coupon/wallet/refund/loyalty/race split is over-fragmentation).
+- [x] Pull into a milestone when capacity allows. `sast-paymentlogic` is the *only* business-logic split worth making — keep everything else inside `sast-businesslogic` with domain heuristics (the 6-way payment/coupon/wallet/refund/loyalty/race split is over-fragmentation). — ✅ all 6 shipped v0.8.0 (`sast-xpath`, `sast-csvinj`, `sast-xmlbomb`, `sast-elinj`, `sast-lockfile`, `sast-paymentlogic`)
 
 ## Cross-skill correlation (export, after schema v2)
 
