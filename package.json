@@ -1,6 +1,6 @@
 {
   "name": "sast-skills",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "LLM SAST skills — turn your AI coding assistant into a SAST scanner for your codebase.",
   "type": "module",
   "bin": {

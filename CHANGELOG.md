@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-06-27
+
+### Added
+
+- **Backlog batch (6 new skills) — the roadmap is complete.** Lower-priority but real coverage gaps, each with the standard recon → batched-verify → merge flow:
+  - `sast-xpath` — XPath injection via string-concatenated expressions (CWE-643).
+  - `sast-csvinj` — formula / CSV injection in spreadsheet exports (CWE-1236).
+  - `sast-xmlbomb` — XML entity-expansion DoS (billion laughs), distinct from XXE (CWE-776).
+  - `sast-elinj` — expression-language injection (OGNL / SpEL / MVEL / JEXL), distinct from template SSTI (CWE-917).
+  - `sast-lockfile` — missing lockfile / unpinned dependency hashes (CWE-494).
+  - `sast-paymentlogic` — e-commerce payment business-logic abuse, the one worthwhile split from `sast-businesslogic` (CWE-840).
+- Totals are now **68 skills across 64 vulnerability classes**, completing the entire roadmap (Milestones 0–4 plus Backlog).
+
 ## [0.7.0] — 2026-06-27
 
 ### Added
