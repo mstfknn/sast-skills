@@ -93,6 +93,11 @@ Do not flag these patterns:
 - **Internal monorepos with CODEOWNERS protection**: If the repo has a `CODEOWNERS` file that requires security team review for changes to `CLAUDE.md`, `.mcp.json`, or `.github/workflows/`, the attack surface for an external contributor inserting a malicious config is substantially reduced. Set `exploitability: conditional` rather than `reachable`, and note the CODEOWNERS gate.
 - **Prose in AI instruction files without executable semantics**: A `CLAUDE.md` that says "When the user asks you to run tests, use `pytest`" is an instruction to an LLM about what to say, not a command to execute. The vulnerability requires the tool to execute the block as a shell command, not merely read it as text.
 
+**Defer to a sibling skill — do not raise a configrce finding for these:**
+
+- A lifecycle-hook *key* (`on_start`, `run:`, `exec:`) or a poisoned `description`/`instructions` field inside a **skill config** (`SKILL.md`, agent-rule frontmatter) is **sast-skillaudit**, not configrce. configrce owns fenced executable code blocks in project instruction files (`CLAUDE.md` / `AGENTS.md`), `.mcp.json` auto-launch (`autoApprove`), IDE/devcontainer/Makefile auto-run, and workflows that evaluate untrusted event payloads at checkout.
+- A workflow whose problem is an **over-broad `permissions:` block or static long-lived credentials** (but which does not auto-execute attacker-controlled content) is **sast-agentidentity**. A workflow that interpolates untrusted `${{ github.event.* }}` into a `run:` step is **sast-pipelineinj**. Raise configrce for a workflow only when repo-controlled content auto-executes shell at checkout/PR open. A scheduled job running a committed first-party script is none of configrce's business — link the `config-pipeline-chain` `chain_id` if relevant, but let the owning skill flag it.
+
 ### Patterns That Make Config-RCE Possible vs. Safe
 
 **Vulnerable — CLAUDE.md with embedded auto-exec block and secret read**

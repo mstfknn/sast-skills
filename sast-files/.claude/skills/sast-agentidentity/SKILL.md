@@ -59,6 +59,11 @@ A non-human identity is over-privileged when the permissions it holds exceed the
 - **Secrets managed by a vault with dynamic short-lived credentials** — if the project uses GitHub Actions OIDC → AWS STS AssumeRoleWithWebIdentity with a TTL of 15 minutes scoped to a single S3 bucket, the dynamic issuance eliminates the static credential risk even if the IAM *statement* is somewhat broad.
 - **Permissions constrained by an SCP or permission boundary** — `"Action": "*"` on `"Resource": "*"` in an inline policy where the account has an SCP that explicitly denies `iam:*`, `ec2:*`, and all data-plane services except S3 is not the same risk as the same inline policy with no boundary. Note the boundary but downgrade severity.
 
+**Defer to a sibling skill — do not raise an agentidentity finding for these:**
+
+- **Missing authentication on an MCP tool handler** (`auth: null`, no caller-identity check, wildcard `allowedOrigins`) is **sast-mcpsec**, not agentidentity. This skill covers a credential or role scoped *broader than the task needs* — an over-privileged identity (static keys, `permissions: write-all`, wildcard IAM) — not the *absence of an auth gate* on a tool.
+- **Hidden instructions or shell hooks** in skill config or repo config are **sast-skillaudit** / **sast-configrce**. A hard-coded secret *value* in source is **sast-hardcodedsecrets** (this skill handles the identity/scope layer, not the literal-string layer).
+
 ### Patterns That Eliminate or Downgrade Findings
 
 Presence of any of the following should trigger careful FP analysis before raising a finding:

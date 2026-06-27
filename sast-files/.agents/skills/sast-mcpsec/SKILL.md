@@ -61,6 +61,12 @@ Do not flag:
 - Tool descriptions that contain technical jargon, lengthy functional explanations, or parameter documentation without behavioral override directives — these are not poisoning attempts.
 - Auth gaps covered by the framework's own host process (e.g., Claude Desktop restricts which servers can be added via user settings with no network exposure) when the tool has no privileged surface.
 
+**Defer to a sibling skill — do not raise an mcpsec finding for these (record the shared `chain_id` instead):**
+
+- A **skill config file** (`SKILL.md`, agent-rule frontmatter, `.cursor/rules`) with a poisoned `description`/`instructions` field or a lifecycle hook belongs to **sast-skillaudit** — even though both involve natural-language directives. mcpsec covers *MCP server / tool* definitions only (`.mcp.json` / `mcp.json`, and `server.ts`/`server.py`/`index.js` tool registrations).
+- A fenced shell block in `CLAUDE.md` / `AGENTS.md` that auto-executes at project open belongs to **sast-configrce**.
+- Static, over-scoped agent credentials or IAM roles belong to **sast-agentidentity**. Missing *auth* on a tool is yours; an over-*privileged credential* is theirs.
+
 ---
 
 ## Attack Taxonomy

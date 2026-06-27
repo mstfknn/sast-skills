@@ -94,6 +94,8 @@ Do not flag these as skillaudit findings:
 - **CI/CD workflow injection**: Shell injection inside GitHub Actions workflow YAML (`${{ github.event.issue.title }}` in a `run:` step) is **sast-configrce** / `sast-pipelineinj`. This skill covers agent skill config files, not CI workflows.
 - **Intentional capability grants**: A skill that explicitly documents that it disables confirmation prompts for a narrowly-scoped task, is authored by the repo owner, pinned, and reviewed. Document the finding as low/medium with confidence low and note the context.
 - **False regex matches**: A description that says "this skill ignores whitespace rules" is not a hidden instruction override. Assess semantically: does this directive, if executed by the agent, change the agent's security-relevant behaviour in a way the parent developer did not intend?
+- **Config-as-execution code blocks**: A fenced executable block (```` ```bash ````, ```` ```python ````) inside `CLAUDE.md` / `AGENTS.md` / `.mcp.json` that auto-runs at project open is **sast-configrce**, not skillaudit. This skill owns hidden natural-language directives and lifecycle-hook *keys* (`on_start`, `run:`, `exec:`) inside skill / agent-rule config; configrce owns fenced code blocks in project instruction files. Link them with the shared `skill-rce-chain` `chain_id` rather than double-flagging.
+- **MCP tool definitions**: A missing-auth gap or a poisoned `description` on an *MCP server tool* (`.mcp.json` / server source) is **sast-mcpsec**, not skillaudit.
 
 ### Patterns That Prevent Hidden-Instruction Attacks
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] — 2026-06-27
+
+### Changed
+
+- **Tightened scope boundaries on the four agentic-security skills** (`sast-mcpsec`, `sast-skillaudit`, `sast-configrce`, `sast-agentidentity`). Each now explicitly defers cross-domain findings to its sibling via the existing `chain_id` mechanism rather than re-flagging the same surface: mcpsec owns MCP server/tool definitions; skillaudit owns hidden directives and lifecycle hooks inside skill/agent-rule config; configrce owns fenced executable blocks in project instruction files and auto-launch config; agentidentity owns over-scoped credentials/roles (not missing-auth gaps). A controlled calibration showed this drops cross-domain duplicate findings from 6 to 0 while recall stays at 100%.
+
 ## [0.8.0] — 2026-06-27
 
 ### Added
