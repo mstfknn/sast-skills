@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-06-27
+
+### Added
+
+- **Milestone 4 — LLM & agent runtime (6 new skills).** Semantic detection of LLM/agent runtime risks, each with an LLM-driven verify step. The `sast-stack` router now lists them so they are skipped on codebases with no LLM/agent SDK:
+  - `sast-excessiveagency` — state-changing tools wired to the model with no human-in-the-loop approval (CWE-250).
+  - `sast-toolcalling` — model output dispatched to a tool without an allow-list or argument validation (CWE-829).
+  - `sast-ragleak` — RAG retrieval with no per-tenant ACL filter → cross-tenant leak and indirect injection (CWE-200).
+  - `sast-systempromptleak` — secrets embedded in or leaked from system prompts via logs or responses (CWE-200).
+  - `sast-memorypoison` — untrusted data persisted to agent memory and later trusted as authoritative (CWE-349).
+  - `sast-llmdos` — missing `max_tokens` / agent iteration caps → denial-of-wallet (CWE-770).
+- An "LLM & agent runtime" category in the README "What it detects" section.
+- This completes the roadmap's main body (Milestones 0–4). Totals are now **62 skills across 58 vulnerability classes**.
+
 ## [0.6.0] — 2026-06-27
 
 ### Added
