@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] — 2026-06-27
+
+### Changed
+
+- **Tightened the `sast-toolcalling` ↔ `sast-excessiveagency` scope boundary.** A strong-TN calibration of all six M4 LLM-runtime skills confirmed they discriminate by control *adequacy* — every genuinely adequate control (retriever tenant-filter + content fence, allow-listed-enum memory writes, Pydantic-validated tool dispatch, approval-gated agent, secret-free unlogged prompt, capped `max_tokens` / `max_iterations`) was correctly left unflagged — but surfaced the same overlap class fixed in 0.8.1: the two tool-authority skills double-flagged the same dispatch sites. `sast-toolcalling` now owns the explicit dispatch site (model-chosen name via `getattr`/`eval`/registry lookup with no allow-list + arg validation) and defers the agent-wiring / approval-gate authority question to `sast-excessiveagency`. They still compose via the `agent-authority` `chain_id`.
+
 ## [0.8.1] — 2026-06-27
 
 ### Changed
