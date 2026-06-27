@@ -28,7 +28,7 @@ Per-milestone specs (scope · sinks · verify · test) live under `roadmap/`:
 - [Milestone 1 — Tier A](roadmap/milestone-1.md) (13 skills) — ✅ shipped v0.4.0
 - [Milestone 2 — Agentic-skills security](roadmap/milestone-2.md) (4 skills) — ✅ shipped v0.5.0
 - [Milestone 3 — API / auth depth](roadmap/milestone-3.md) (7 skills) — ✅ shipped v0.6.0
-- [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills)
+- [Milestone 4 — LLM / agentic semantic](roadmap/milestone-4.md) (6 skills) — ✅ shipped v0.7.0
 - [Backlog](roadmap/milestone-backlog.md) (6 skills)
 
 ## Milestone 0 — Infra first (do before mass skill authoring)
@@ -97,7 +97,7 @@ This surface is uniquely yours because the product *is* skills. Under active att
 | `sast-memorypoison` | untrusted data written to persistent agent memory | ASI26 ASI06 |
 | `sast-llmdos` | no `max_tokens`, recursive agent loop, denial-of-wallet | LLM25 LLM10 |
 
-- [ ] Author all 6. Consider gating these behind the router so they never run on non-LLM codebases.
+- [x] Author all 6. Consider gating these behind the router so they never run on non-LLM codebases. — ✅ shipped v0.7.0 (`sast-stack` lists all six in its LLM/agent-skip set)
 
 ## Backlog — catalogued, lower priority
 
