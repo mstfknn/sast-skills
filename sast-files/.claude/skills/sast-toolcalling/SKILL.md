@@ -48,12 +48,12 @@ Classic vulnerability classes that surface through unsafe tool dispatch include:
 **Cover these dispatch patterns** (all flow from model output → function execution):
 
 - **Dynamic name dispatch**: `getattr(module, tool_name)()`, `tools[tool_name](args)`, `handlers.get(tool_name)(args)`, `TOOL_MAP[name](**kwargs)`, `this[methodName](args)`, `obj[key](args)`, `eval(tool_name + "(" + args_json + ")")` where `tool_name` originates from a model response.
-- **LangChain AgentExecutor / AgentAction**: `AgentExecutor.invoke({...})` where the tool registry includes tools beyond the current task's scope; `AgentAction.tool` and `AgentAction.tool_input` dispatched without validation.
+- **LangChain AgentAction dispatch**: `AgentAction.tool` / `AgentAction.tool_input` routed to a handler without name allow-listing or typed argument validation. (Whether the *registry* is over-broad or wires destructive tools with no approval gate is the authority question — that belongs to **sast-excessiveagency**; this skill owns only the unvalidated dispatch step.)
 - **LangGraph edge routing on model-chosen node names**: `graph.add_conditional_edges(node, lambda state: state["next"], {...})` where `state["next"]` is set from model output without an allow-list check on the keys.
 - **OpenAI / Anthropic tool-use dispatch**: `response.choices[0].message.tool_calls[0].function.name` or `response.content[].type == "tool_use"` routed to a handler without name validation, or argument JSON passed to the handler without a per-tool typed schema.
 - **Vercel AI SDK `tools[toolName].execute(args)`**: dispatch without `if (ALLOWED_TOOLS.includes(toolName))` guard.
 - **Tool argument schemas with no enum/pattern constraint on safety-critical fields**: `"path": {"type": "string"}` where the implementation uses `path` in a file operation — no constraint means model can supply any path.
-- **Destructive tool calls without human-in-the-loop confirmation**: `deleteAccount`, `transferFunds`, `sendEmail`, `runSql`, `executeShell`, `publishPost` called from model output without a user-confirmation step.
+- **Destructive tool reached through an unvalidated dispatch site**: `deleteAccount`, `transferFunds`, `runSql`, etc. reached via a model-chosen name with no allow-list at the call site. The *call-site dispatch* is yours; the broader "should this agent hold this authority at all, and is it approval-gated" question is **sast-excessiveagency** — attach the shared `agent-authority` `chain_id` and do not double-flag the same agent-wiring line.
 
 **Do NOT cover** (handled by other skills, or safe):
 
@@ -63,6 +63,7 @@ Classic vulnerability classes that surface through unsafe tool dispatch include:
 - Model-generated URLs passed to `fetch()` — **sast-llmoutput** (SSRF sink).
 - Tools that the model is legitimately allowed to call, provided the caller enforces an explicit allow-list and per-tool typed argument schemas.
 - Static tool registries where the dispatch key is hardcoded in application logic (not taken from model output).
+- An agent whose only issue is an **over-broad tool registry or destructive tools wired with `allow_dangerous_requests=True` / no approval callback** — with no explicit `getattr`/`eval`/registry-lookup dispatch of a model-chosen name — is **sast-excessiveagency**, not toolcalling. Reach for toolcalling only when there is a concrete unvalidated dispatch site; let excessiveagency own the agent-wiring line.
 
 ### What Makes Tool Dispatch SAFE
 

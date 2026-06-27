@@ -70,6 +70,7 @@ Do not flag these — they are out of scope:
 - **Sandboxed demo or test agents with no real side effects**: agents whose tools write to a temp directory, a test database, or a mock service that cannot affect production. Verify this is actually sandboxed — do not assume.
 - **Dry-run mode**: tools with `dry_run=True` by default (and require explicit `dry_run=False` to produce side effects) are safe as long as the live flag is not reachable from model input alone.
 - **Agent output that requires human acceptance before application**: "plan and present" patterns where the agent's proposed actions are shown to the user and not applied until the user clicks "Apply" or equivalent.
+- **An explicit dynamic dispatch of a model-chosen tool name** (`getattr`/`eval`/registry lookup on `tool_call.name` with no allow-list and no argument validation) is **sast-toolcalling**, not excessiveagency — even when the dispatched tools are destructive. This skill owns the *authority* question (state-changing tools wired to the model with no human-in-the-loop gate, regardless of dispatch mechanism); toolcalling owns the *dispatch-site* question. When both fire on the same agent, attach the shared `agent-authority` `chain_id` and let toolcalling own the dispatch-site line so the same line is not double-flagged.
 
 ### How Approval Gates Work
 
