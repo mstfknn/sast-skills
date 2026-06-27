@@ -4,8 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-`sast-skills` is a **content bundle wrapped in a Node CLI**. The product is 31 agent-skill
-markdown files (`SKILL.md`) that turn an LLM coding assistant into a SAST scanner. The
+`sast-skills` is a **content bundle wrapped in a Node CLI**. The product is 68 agent-skill
+markdown files (`SKILL.md`) — 64 detection skills across 64 vulnerability classes plus 4
+recon/synthesis skills — that turn an LLM coding assistant into a SAST scanner. The
 JavaScript in `src/`, `bin/`, and `scripts/` only *installs*, *syncs*, and *aggregates* —
 it never analyzes code itself. Most "features" are edits to the markdown skills, not the JS.
 
@@ -80,7 +81,7 @@ all consume it. There is no more `ASSISTANT_LAYOUT`.
   shipped to users. **They are byte-identical except for skill-tree path names** and must
   stay that way. Do not confuse them with *this* repo's own dev CLAUDE.md (the file you're
   reading). Editing the product orchestrator means editing both.
-- `.claude/skills/` is the **canonical** skill tree (31 dirs, one `SKILL.md` each).
+- `.claude/skills/` is the **canonical** skill tree (68 dirs, one `SKILL.md` each).
 - `.agents/skills/` is **generated** — `npm run sync` does `rm -rf` + `cp -R` from the
   canonical tree. Never hand-edit `.agents/skills/`; your change will be erased on next sync.
 
@@ -93,6 +94,25 @@ defines the same three-phase pattern every detection skill uses:
 each, taint analysis) → **merge** (consolidate into `sast/<skill>-results.md` +
 `sast/<skill>-results.json`). The canonical finding JSON schema is documented in the
 orchestrator and in the README under "Finding schema".
+
+### Routing, schema v2, and framework profiles (the M0 layer)
+
+- **Tech-stack router** — `sast-stack` (a recon/synthesis skill, not a detector) runs at the
+  orchestrator's **Step 1b**, after `sast-analysis`. It reads the project's manifests and writes
+  `sast/stack.md`: a JSON map of detected stacks → selected skills (+ per-skill `profile`) → an
+  always-on set (`sast-hardcodedsecrets`, `sast-deps`, `sast-iac`, `sast-pipelineinj`,
+  `sast-crypto`) → skipped skills with reasons. Step 2 runs only the selected subset; if
+  `sast/stack.md` is absent it falls back to the full catalog. The router is what keeps a
+  64-detector fan-out affordable and gates LLM/agent-only skills off non-LLM repos.
+- **Framework profiles** — `sast-files/profiles/{django,spring,express,rails,fastapi}.md` are
+  FP-killer fact sheets shipped via the package `files` allowlist; `install` copies them to
+  `<tree>/profiles/`. A detection skill reads its assigned profile during verify to suppress
+  framework-default false positives.
+- **Findings schema v2** — every canonical finding may also carry `exploitability`
+  (reachable|conditional|unreachable|unknown), `confidence` (high|medium|low), and `chain_id`
+  (a stable id shared by findings that compose into one attack). These are optional; set them
+  when verify can. `sast-skills export` stamps the aggregated output with `run.schema: "2.0"`
+  and maps the three fields to SARIF `properties`.
 
 ## Critical invariants (the tests enforce these — they will fail loudly otherwise)
 
