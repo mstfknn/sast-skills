@@ -84,6 +84,12 @@ Run the detection skills **selected by the router** in `sast/stack.md` — its `
 - Skip Unsafe Tool Calling if `sast/toolcalling-results.md` already exists.
 - Skip Memory Poisoning if `sast/memorypoison-results.md` already exists.
 - Skip LLM Denial-of-Wallet if `sast/llmdos-results.md` already exists.
+- Skip XPath Injection if `sast/xpath-results.md` already exists.
+- Skip CSV Injection if `sast/csvinj-results.md` already exists.
+- Skip XML Bomb if `sast/xmlbomb-results.md` already exists.
+- Skip EL Injection if `sast/elinj-results.md` already exists.
+- Skip Lockfile Integrity if `sast/lockfile-results.md` already exists.
+- Skip Payment Logic if `sast/paymentlogic-results.md` already exists.
 
 Start **one subagent per check**, all **in parallel**, each with a dedicated task. Give each subagent the same instruction pattern, using the skill name and paths from the table:
 
@@ -149,6 +155,12 @@ Start **one subagent per check**, all **in parallel**, each with a dedicated tas
 | sast-toolcalling | `sast/toolcalling-results.md` | `sast/toolcalling-recon.md`, `sast/toolcalling-batch-*.md` |
 | sast-memorypoison | `sast/memorypoison-results.md` | `sast/memorypoison-recon.md`, `sast/memorypoison-batch-*.md` |
 | sast-llmdos | `sast/llmdos-results.md` | `sast/llmdos-recon.md`, `sast/llmdos-batch-*.md` |
+| sast-xpath | `sast/xpath-results.md` | `sast/xpath-recon.md`, `sast/xpath-batch-*.md` |
+| sast-csvinj | `sast/csvinj-results.md` | `sast/csvinj-recon.md`, `sast/csvinj-batch-*.md` |
+| sast-xmlbomb | `sast/xmlbomb-results.md` | `sast/xmlbomb-recon.md`, `sast/xmlbomb-batch-*.md` |
+| sast-elinj | `sast/elinj-results.md` | `sast/elinj-recon.md`, `sast/elinj-batch-*.md` |
+| sast-lockfile | `sast/lockfile-results.md` | `sast/lockfile-recon.md`, `sast/lockfile-batch-*.md` |
+| sast-paymentlogic | `sast/paymentlogic-results.md` | `sast/paymentlogic-recon.md`, `sast/paymentlogic-batch-*.md` |
 
 Wait for all subagents to finish before proceeding.
 

@@ -7,7 +7,7 @@ export function BANNER(version) {
     `██████╔╝ ██║  ██║███████║   ██║       ███████║██║  ██╗██║███████╗███████╗██████╔╝ v${version}`,
     '╚══════╝  ╚═╝  ╚═╝╚══════╝   ╚═╝       ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝',
     ' Turn your AI coding assistant into a SAST scanner',
-    ' github.com/mstfknn/sast-skills · 62 skills, 58 classes',
+    ' github.com/mstfknn/sast-skills · 68 skills, 64 classes',
     '',
   ].join('\n');
 }

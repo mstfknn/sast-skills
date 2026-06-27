@@ -46,7 +46,7 @@ It runs all four phases and writes findings to `sast/`. Aggregate them with `npx
 
 ## ✨ Highlights
 
-- **62 skills across 58 vulnerability classes** — injection, broken access control, API & session depth (rate-limiting, OAuth/OIDC, session fixation, shadow routes), weak crypto, file handling, supply chain, CI/CD & cloud-metadata risks, business logic, agentic/MCP security (skill-config poisoning, MCP tool poisoning, config-as-execution, over-privileged agent identity), and LLM/agent runtime (excessive agency, RAG isolation, unsafe tool calling, memory poisoning, denial-of-wallet), plus a tech-stack router.
+- **68 skills across 64 vulnerability classes** — injection (incl. XPath, expression-language, CSV-formula, XML-bomb variants), broken access control, API & session depth (rate-limiting, OAuth/OIDC, session fixation, shadow routes), weak crypto, file handling, supply chain, CI/CD & cloud-metadata risks, business logic & payment abuse, agentic/MCP security (skill-config poisoning, MCP tool poisoning, config-as-execution, over-privileged agent identity), and LLM/agent runtime (excessive agency, RAG isolation, unsafe tool calling, memory poisoning, denial-of-wallet), plus a tech-stack router.
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
 - **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
 - **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
@@ -63,7 +63,7 @@ The orchestrator executes four phases — reconnaissance, parallel detection, sy
 flowchart TD
     U(["User: Run vulnerability scan"]) --> R{"CLAUDE.md / AGENTS.md orchestrator"}
     R --> S1["Step 1 — sast-analysis<br/>codebase and architecture map"]
-    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>58 skills: recon, batched verify, merge"]
+    S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>64 skills: recon, batched verify, merge"]
     S2 -->|sast/*-results.md and *-results.json| S3["Step 3 — sast-report<br/>consolidate and rank"]
     S3 -->|sast/final-report.md| S4["Step 4 — sast-triage<br/>false-positive elimination,<br/>severity adjustment with evidence"]
     S4 -->|sast/final-report-triaged.md and triaged.json| EXP["npx sast-skills export<br/>JSON, SARIF, HTML"]
@@ -104,6 +104,9 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-crlf` | CRLF / HTTP response splitting (header injection) |
 | `sast-ssrfimds` | Cloud metadata SSRF (IMDSv1 credential theft) |
 | `sast-unsafeconsumption` | Unvalidated third-party API response into a sink (second-order injection) |
+| `sast-xpath` | XPath injection (user input into an XPath expression) |
+| `sast-csvinj` | Formula / CSV injection in spreadsheet exports |
+| `sast-elinj` | Expression-language injection (OGNL / SpEL / MVEL / JEXL) |
 
 ### Access control & Auth
 
@@ -137,6 +140,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-tls` | Disabled TLS certificate / hostname verification |
 | `sast-zipslip` | Zip Slip — archive-extraction path traversal |
 | `sast-dangerousapi` | Dangerous API sinks (eval / exec / reflection / native bridges) |
+| `sast-xmlbomb` | XML entity-expansion DoS (billion laughs / quadratic blowup) |
 
 ### Data exposure & supply chain
 
@@ -150,6 +154,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | `sast-excessivedata` | Excessive data exposure in API responses |
 | `sast-pipelineinj` | CI/CD pipeline injection (untrusted event payloads) |
 | `sast-depconfusion` | Dependency confusion + install-time script execution |
+| `sast-lockfile` | Missing lockfile / unpinned dependency hashes |
 | `sast-cloudsdk` | Cloud SDK misuse (public bucket, hardcoded key, broad IAM) |
 
 ### Business logic & LLM-specific
@@ -157,6 +162,7 @@ All skills follow the same three-phase pattern: **recon** → **batched verify**
 | Skill | Vulnerability Class |
 |---|---|
 | `sast-businesslogic` | Price manipulation, workflow bypass, reward abuse |
+| `sast-paymentlogic` | E-commerce payment abuse (price / coupon / refund / balance race) |
 | `sast-promptinjection` | Untrusted text reaching an LLM prompt (OWASP LLM #1) |
 | `sast-llmoutput` | Unvalidated LLM output reaching code / HTML / SQL / shell sinks (OWASP LLM #2) |
 
@@ -219,8 +225,8 @@ Everything you need lives under `sast-skills/sast-files/`:
 sast-files/
 ├── CLAUDE.md                       # Orchestrator entry for Claude Code
 ├── AGENTS.md                       # Orchestrator entry for Gemini CLI / Codex / OpenCode / Cursor
-├── .claude/skills/sast-*/SKILL.md  # 62 skills in Claude Code format
-└── .agents/skills/sast-*/SKILL.md  # Same 62 skills mirrored for AGENTS.md assistants
+├── .claude/skills/sast-*/SKILL.md  # 68 skills in Claude Code format
+└── .agents/skills/sast-*/SKILL.md  # Same 68 skills mirrored for AGENTS.md assistants
 ```
 
 The two skill trees are kept in sync by `npm run sync` — content is identical, only the directory name differs.
