@@ -6,11 +6,13 @@ Thanks for wanting to help. This project follows **test-driven development** end
 
 ```text
 bin/sast-skills.js          thin CLI shim — argv routing only
-src/cli.js                  command router (install/update/uninstall/doctor)
+src/cli.js                  command router (install/update/uninstall/doctor/export)
 src/commands/*.js           one file per command
+src/agents.js               assistant registry (single source of truth)
 src/prompts/clack.js        @clack/prompts wrapper
 scripts/sync-skills.js      keep .agents/skills byte-identical to .claude/skills
 scripts/scaffold-skill.js   create a new skill SKILL.md in both trees
+scripts/register-skill.js   patch CLAUDE.md / AGENTS.md / README.md for a new skill
 sast-files/CLAUDE.md        Claude Code entry file shipped to users
 sast-files/AGENTS.md        AGENTS.md entry file shipped to users
 sast-files/.claude/skills/  canonical skill tree (edit these)
@@ -37,9 +39,17 @@ Node 20+ required.
 
    This creates `SKILL.md` stubs under `sast-files/.claude/skills/sast-yourcheck/` and the matching path in `.agents/skills/`.
 
-2. Write the skill body in `sast-files/.claude/skills/sast-yourcheck/SKILL.md`.
+2. Register it in the orchestrators and the README (skip-line, catalog row, README row):
 
-3. Sync the mirror:
+   ```bash
+   node scripts/register-skill.js sast-yourcheck yourcheck "Your Check" "One-line description"
+   ```
+
+   Use this rather than hand-patching `sast-files/CLAUDE.md`, `sast-files/AGENTS.md`, and `README.md` — `docs-completeness.test.js` fails if any of the three is missing the reference. The README row lands at the end of the last detection-class table; move it to the right "What it detects" category by hand (cross-table placement is editorial).
+
+3. Write the skill body in `sast-files/.claude/skills/sast-yourcheck/SKILL.md` — follow the recon → batched-verify → merge structure of an existing skill (e.g. `sast-sqli` for taint, `sast-tls` for config detection). Emit the canonical finding JSON (with the schema-v2 `exploitability` / `confidence` / `chain_id` fields).
+
+4. Sync the mirror:
 
    ```bash
    npm run sync
@@ -47,9 +57,19 @@ Node 20+ required.
 
    This rewrites `.agents/skills` from `.claude/skills`. A regression test catches drift; `prepublishOnly` runs sync before every publish.
 
-4. Reference the skill in `sast-files/CLAUDE.md`, `sast-files/AGENTS.md`, and `README.md`. There are tests that fail if you forget.
-
 5. If the skill's vuln class deserves a dedicated `sast-report` row, update that too.
+
+### Scope boundaries (keep skills from double-flagging)
+
+When a new skill's domain overlaps a sibling's (common for agentic / LLM-runtime
+skills), give it an explicit **"defer to a sibling skill"** boundary in its
+`is NOT` / scope section, keyed to the shared `chain_id`. A skill should own one
+concern and hand the rest to the owning sibling rather than re-flagging the same
+line — e.g. `sast-mcpsec` owns MCP tool definitions and defers skill-config hooks
+to `sast-skillaudit`; `sast-toolcalling` owns the explicit dispatch site and
+defers the agent-authority question to `sast-excessiveagency`. The findings still
+compose via `chain_id`; they just aren't double-raised. This keeps precision high
+when several related skills run over the same file.
 
 ## Editing `.claude/skills` vs `.agents/skills`
 
