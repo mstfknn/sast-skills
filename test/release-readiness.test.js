@@ -120,3 +120,17 @@ test('the OSCAL export is documented in the README, the dev guide, the CLI help,
     expect(orchestrator, file).toMatch(/OSCAL/);
   }
 });
+
+test('CONTRIBUTING.md describes the OSCAL control map as part of the add-a-skill loop', async () => {
+  const content = await readFile(resolve(repoRoot, 'CONTRIBUTING.md'), 'utf8');
+
+  // The project layout must list the modules a contributor will actually touch.
+  expect(content).toMatch(/src\/oscal\.js/);
+  expect(content).toMatch(/src\/oscal-controls\.js/);
+
+  // register-skill.js now seeds a control mapping, and leaving it at the ra-5
+  // fallback is a decision the author has to make consciously.
+  expect(content).toMatch(/oscal-controls/);
+  expect(content).toMatch(/ra-5/);
+  expect(content).toMatch(/800-53/);
+});

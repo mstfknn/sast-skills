@@ -9,10 +9,12 @@ bin/sast-skills.js          thin CLI shim — argv routing only
 src/cli.js                  command router (install/update/uninstall/doctor/export)
 src/commands/*.js           one file per command
 src/agents.js               assistant registry (single source of truth)
+src/oscal.js                OSCAL 1.2.3 renderers (assessment-results + POA&M)
+src/oscal-controls.js       skill → NIST SP 800-53 Rev 5 control map
 src/prompts/clack.js        @clack/prompts wrapper
 scripts/sync-skills.js      keep .agents/skills byte-identical to .claude/skills
 scripts/scaffold-skill.js   create a new skill SKILL.md in both trees
-scripts/register-skill.js   patch CLAUDE.md / AGENTS.md / README.md for a new skill
+scripts/register-skill.js   patch the orchestrators, README, and the control map
 sast-files/CLAUDE.md        Claude Code entry file shipped to users
 sast-files/AGENTS.md        AGENTS.md entry file shipped to users
 sast-files/.claude/skills/  canonical skill tree (edit these)
@@ -39,7 +41,7 @@ Node 20+ required.
 
    This creates `SKILL.md` stubs under `sast-files/.claude/skills/sast-yourcheck/` and the matching path in `.agents/skills/`.
 
-2. Register it in the orchestrators and the README (skip-line, catalog row, README row):
+2. Register it in the orchestrators, the README, and the OSCAL control map (skip-line, catalog row, README row, control entry):
 
    ```bash
    node scripts/register-skill.js sast-yourcheck yourcheck "Your Check" "One-line description"
@@ -47,9 +49,11 @@ Node 20+ required.
 
    Use this rather than hand-patching `sast-files/CLAUDE.md`, `sast-files/AGENTS.md`, and `README.md` — `docs-completeness.test.js` fails if any of the three is missing the reference. The README row lands at the end of the last detection-class table; move it to the right "What it detects" category by hand (cross-table placement is editorial).
 
-3. Write the skill body in `sast-files/.claude/skills/sast-yourcheck/SKILL.md` — follow the recon → batched-verify → merge structure of an existing skill (e.g. `sast-sqli` for taint, `sast-tls` for config detection). Emit the canonical finding JSON (with the schema-v2 `exploitability` / `confidence` / `chain_id` fields).
+3. Narrow the OSCAL control mapping. `register-skill.js` seeds `'sast-yourcheck': ['ra-5']` in [`src/oscal-controls.js`](src/oscal-controls.js) so the skill is never unmapped, but `ra-5` (Vulnerability Monitoring and Scanning) only says "a scanner ran". Replace it with the **NIST SP 800-53 Rev 5** controls whose objective your findings actually defeat — `si-10` for input validation, `ac-3`/`ac-6` for access control, `sc-13` for crypto, `sc-5` for availability, `sr-3`/`sr-11` for supply chain. That id is what an auditor reads in the exported `assessment-results` document, so it is a judgement call worth making rather than leaving to the fallback. `oscal-controls.test.js` fails on an unmapped skill, a stale entry, or a malformed control id.
 
-4. Sync the mirror:
+4. Write the skill body in `sast-files/.claude/skills/sast-yourcheck/SKILL.md` — follow the recon → batched-verify → merge structure of an existing skill (e.g. `sast-sqli` for taint, `sast-tls` for config detection). Emit the canonical finding JSON (with the schema-v2 `exploitability` / `confidence` / `chain_id` fields).
+
+5. Sync the mirror:
 
    ```bash
    npm run sync
@@ -57,7 +61,7 @@ Node 20+ required.
 
    This rewrites `.agents/skills` from `.claude/skills`. A regression test catches drift; `prepublishOnly` runs sync before every publish.
 
-5. If the skill's vuln class deserves a dedicated `sast-report` row, update that too.
+6. If the skill's vuln class deserves a dedicated `sast-report` row, update that too.
 
 ### Scope boundaries (keep skills from double-flagging)
 

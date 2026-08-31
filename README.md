@@ -26,7 +26,7 @@ Then open the project in your assistant and prompt:
 
 > **Run vulnerability scan**
 
-It runs all four phases and writes findings to `sast/`. Aggregate them with `npx sast-skills export --format sarif` for GitHub Code Scanning or CI.
+It runs all four phases and writes findings to `sast/`. Aggregate them with `npx sast-skills export --format sarif` for GitHub Code Scanning, or `--format oscal` for [NIST OSCAL](#nist-oscal-compliance-evidence) compliance evidence.
 
 ---
 
@@ -400,6 +400,25 @@ npx sast-skills export --input sast/ --triaged --format oscal --output sast-skil
 
 # Plan of Action and Milestones (POA&M) — the remediation backlog
 npx sast-skills export --input sast/ --triaged --format oscal-poam --output sast-skills-poam.json
+```
+
+In GitHub Actions, OSCAL documents are workflow artifacts rather than Code Scanning uploads — Code Scanning speaks SARIF, GRC platforms speak OSCAL, so the two run side by side:
+
+```yaml
+- uses: mstfknn/sast-skills/.github/actions/scan@main   # SARIF → Code Scanning
+  with:
+    input: sast/
+    output: sast-skills.sarif
+
+- name: Export OSCAL
+  run: |
+    npx sast-skills@latest export --input sast/ --triaged --format oscal      --output sast-skills-sar.json
+    npx sast-skills@latest export --input sast/ --triaged --format oscal-poam --output sast-skills-poam.json
+
+- uses: actions/upload-artifact@v4
+  with:
+    name: oscal
+    path: sast-skills-*.json
 ```
 
 **How a finding maps.** OSCAL separates evidence from risk from compliance verdict, so each sast-skills finding fans out into three linked objects:
