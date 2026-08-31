@@ -21,3 +21,18 @@ test('.github/workflows/test.yml also runs markdown lint', async () => {
   const content = await readFile(workflow, 'utf8');
   expect(content).toMatch(/npm run lint:md/);
 });
+
+test('publish.yml installs an npm major that still supports the Node it pins', async () => {
+  const publish = resolve(here, '..', '.github', 'workflows', 'publish.yml');
+  const content = await readFile(publish, 'utf8');
+
+  expect(content).toMatch(/tags:\s*\n\s*-\s*'v\*'/);
+  expect(content).toMatch(/npm publish --provenance/);
+  expect(content).toMatch(/id-token:\s*write/);
+
+  // OIDC trusted publishing needs npm >= 11.5.1, but `npm@latest` is now npm 12,
+  // which dropped Node 20 — an unbounded `@latest` silently breaks every release
+  // the day a new npm major lands. Pin the major that matches the pinned Node.
+  expect(content).not.toMatch(/npm install -g npm@latest/);
+  expect(content).toMatch(/npm install -g npm@\^?11/);
+});

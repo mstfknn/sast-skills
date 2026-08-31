@@ -32,7 +32,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: npm
       # OIDC trusted publishing needs npm >= 11.5.1; Node 20 ships npm 10.
-      - run: npm install -g npm@latest
+      # Pinned to the 11.x major on purpose: npm 12 requires Node >= 22.22.2, so
+      # an unbounded `npm@latest` breaks this job the day a new npm major lands.
+      # Bump this range only together with the Node version above.
+      - run: npm install -g npm@^11.5.1
       - run: npm ci
       # No auth token: credentials come from the GitHub OIDC identity via the
       # npm trusted publisher configured for this repo + workflow.
