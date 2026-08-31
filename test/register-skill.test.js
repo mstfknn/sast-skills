@@ -34,6 +34,15 @@ beforeEach(async () => {
     '## Step 3: Report Generation',
   ].join('\n'));
 
+  await mkdir(join(workdir, 'src'), { recursive: true });
+  await writeFile(join(workdir, 'src', 'oscal-controls.js'), [
+    'export const SKILL_CONTROLS = {',
+    "  'sast-sqli': ['si-10'],",
+    '};',
+    '',
+    "export const FALLBACK_CONTROLS = ['ra-5'];",
+  ].join('\n'));
+
   // Mirror the real README: backtick'd rows, a meta "Recon & synthesis" table
   // followed by detection-class tables, and a trailing section after them.
   await writeFile(join(workdir, 'README.md'), [
@@ -146,4 +155,12 @@ test('registerSkill uses the name/label/description/resultsBasename args — not
 
   const readme = await readFile(join(workdir, 'README.md'), 'utf8');
   expect(readme).toMatch(/\| `sast-openredirect` \| Open redirect bugs \|/);
+});
+
+test('registerSkill seeds an OSCAL control mapping so a new skill cannot ship unmapped', async () => {
+  await registerSkill({ ...FIXTURE, repoRoot: workdir });
+  const controls = await readFile(join(workdir, 'src', 'oscal-controls.js'), 'utf8');
+
+  expect(controls).toMatch(/'sast-csrf': \['ra-5'\],/);
+  expect(controls).toMatch(/'sast-sqli': \['si-10'\],/); // existing entries survive
 });

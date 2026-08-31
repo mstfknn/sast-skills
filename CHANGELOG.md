@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-08-31
+
+### Added
+
+- **NIST OSCAL export.** `sast-skills export` now emits [OSCAL](https://github.com/usnistgov/OSCAL) 1.2.3 alongside JSON / SARIF / HTML, so a scan can be handed to a GRC platform or filed as audit evidence without a translation step:
+  - `--format oscal` → a `assessment-results` (SAR) document. Each finding fans out into a linked **observation** (evidence, `methods: ["TEST"]`, `file#Lnn` href), **risk** (severity / likelihood / confidence facets, remediation as a `recommendation` response), and one **finding** per mapped control (`target-id` `si-10_smt`, status `not-satisfied`).
+  - `--format oscal-poam` → a `plan-of-action-and-milestones` with one `poam-item` per open finding. Triaged false positives are excluded here but retained in the SAR as **closed** risks, since a POA&M lists only work still owed.
+  - **NIST SP 800-53 Rev 5 control mapping** in the new `src/oscal-controls.js` — every detection skill maps to the controls its findings put in doubt (`sast-sqli` → `si-10`, `sast-crypto` → `sc-13`/`sc-28`, `sast-missingauth` → `ac-3`/`ac-6`/`ia-2`, …), feeding `reviewed-controls` and each finding target. An unmapped skill falls back to `ra-5` rather than being dropped, and `scripts/register-skill.js` seeds that fallback when scaffolding a new skill.
+  - **Deterministic identifiers** — all UUIDs are content-derived RFC 4122 v5, so re-exporting an unchanged `sast/` directory is byte-identical apart from run timestamps and the documents are safe to commit and diff.
+  - Output is validated in CI against the published NIST JSON schemas (`ajv`, vendored under `test/fixtures/oscal/`).
+
+### Changed
+
+- `sast-skills export` now **rejects an unrecognised `--format`** with an actionable error instead of silently falling back to raw JSON — a real footgun now that five format names are accepted.
+
 ## [0.8.2] — 2026-06-27
 
 ### Changed

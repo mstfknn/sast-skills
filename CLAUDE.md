@@ -33,10 +33,11 @@ node bin/sast-skills.js install --yes --assistant claude,cursor --scope project
 node bin/sast-skills.js update --yes --target .
 node bin/sast-skills.js doctor --target . --assistant claude
 node bin/sast-skills.js export --input sast/ --format sarif --output report.sarif
+node bin/sast-skills.js export --input sast/ --format oscal --output sar.json
 
 # Add a new vulnerability skill (run both, in order):
 node scripts/scaffold-skill.js sast-foo                       # stub SKILL.md in BOTH trees
-node scripts/register-skill.js sast-foo foo "Foo" "Foo desc"  # patch CLAUDE.md, AGENTS.md, README.md
+node scripts/register-skill.js sast-foo foo "Foo" "Foo desc"  # patch CLAUDE.md, AGENTS.md, README.md, oscal-controls.js
 npm run sync                                                   # then re-sync the mirror
 ```
 
@@ -72,8 +73,10 @@ all consume it. There is no more `ASSISTANT_LAYOUT`.
 - **`update`** (its own command, `src/commands/update.js`) auto-detects an existing install by
   the orchestrator signature and refreshes only what's present, never clobbering a user-authored
   file; with `--assistant` it delegates to `install --force`.
-- **`export`** reads canonical `sast/*-results.json` findings → JSON / SARIF 2.1.0 / HTML
-  (`--triaged` prefers `sast/triaged.json`); the run version is stamped from `package.json`.
+- **`export`** reads canonical `sast/*-results.json` findings → JSON / SARIF 2.1.0 / HTML /
+  **OSCAL** (`--triaged` prefers `sast/triaged.json`); the run version is stamped from
+  `package.json`. Formats live in a `renderers` map in `src/commands/export.js`; an
+  unrecognised `--format` throws rather than silently falling back to JSON.
 
 ### The skill bundle (`sast-files/`)
 
@@ -108,6 +111,16 @@ orchestrator and in the README under "Finding schema".
   FP-killer fact sheets shipped via the package `files` allowlist; `install` copies them to
   `<tree>/profiles/`. A detection skill reads its assigned profile during verify to suppress
   framework-default false positives.
+- **OSCAL export** (`src/oscal.js` + `src/oscal-controls.js`) — renders the same findings as a
+  NIST **OSCAL 1.2.3** `assessment-results` (`--format oscal`) or `plan-of-action-and-milestones`
+  (`--format oscal-poam`). One finding fans out into a linked observation + risk + one finding
+  per mapped control. `src/oscal-controls.js` maps every detection skill to NIST SP 800-53 Rev 5
+  control ids (fallback `ra-5`); `oscal-controls.test.js` fails if a bundled skill is unmapped or
+  a mapping is stale, and `register-skill.js` seeds a fallback entry when scaffolding. All UUIDs
+  are content-derived RFC 4122 **v5** so re-exports are byte-identical apart from timestamps —
+  OSCAL requires v4 or v5 and every optional OSCAL array has `minItems: 1`, so empty arrays must
+  be omitted, never emitted as `[]`. `test/oscal-export.test.js` validates output against the
+  vendored NIST schemas in `test/fixtures/oscal/` with `ajv`.
 - **Findings schema v2** — every canonical finding may also carry `exploitability`
   (reachable|conditional|unreachable|unknown), `confidence` (high|medium|low), and `chain_id`
   (a stable id shared by findings that compose into one attack). These are optional; set them
@@ -131,7 +144,9 @@ orchestrator and in the README under "Finding schema".
 
 1. `node scripts/scaffold-skill.js sast-foo` — stubs the dir in both trees.
 2. `node scripts/register-skill.js sast-foo foo "Foo Label" "One-line description"` — patches
-   `sast-files/CLAUDE.md`, `sast-files/AGENTS.md`, and `README.md`.
+   `sast-files/CLAUDE.md`, `sast-files/AGENTS.md`, `README.md`, and seeds a fallback `ra-5`
+   entry in `src/oscal-controls.js`. Narrow that entry to the SP 800-53 controls the new
+   vulnerability class actually defeats.
 3. Write the real `SKILL.md` body in `sast-files/.claude/skills/sast-foo/` following the
    recon → batched-verify → merge structure of an existing skill (e.g. `sast-sqli`).
 4. `npm run sync` to regenerate `.agents/skills/`.

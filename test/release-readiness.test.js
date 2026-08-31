@@ -98,3 +98,25 @@ test('README reflects the full 0.1.0 surface: badges, flow diagram, every CLI co
   expect(content).toMatch(/pre-commit/);
   expect(content).toMatch(/docker build/i);
 });
+
+test('the OSCAL export is documented in the README, the dev guide, the CLI help, and both orchestrators', async () => {
+  const readme = await readFile(resolve(repoRoot, 'README.md'), 'utf8');
+  expect(readme).toMatch(/--format\s+oscal\b/);
+  expect(readme).toMatch(/--format\s+oscal-poam\b/);
+  expect(readme).toMatch(/assessment-results/);
+  expect(readme).toMatch(/plan-of-action-and-milestones|POA&M/);
+  expect(readme).toMatch(/800-53/);
+  expect(readme).toMatch(/usnistgov\/OSCAL/i);
+
+  const bin = await readFile(resolve(repoRoot, 'bin', 'sast-skills.js'), 'utf8');
+  expect(bin).toMatch(/OSCAL/);
+
+  const devGuide = await readFile(resolve(repoRoot, 'CLAUDE.md'), 'utf8');
+  expect(devGuide).toMatch(/oscal-controls\.js/);
+
+  // Both bundled orchestrators must advertise the same export surface.
+  for (const file of ['CLAUDE.md', 'AGENTS.md']) {
+    const orchestrator = await readFile(resolve(repoRoot, 'sast-files', file), 'utf8');
+    expect(orchestrator, file).toMatch(/OSCAL/);
+  }
+});

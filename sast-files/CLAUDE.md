@@ -166,7 +166,7 @@ Wait for all subagents to finish before proceeding.
 
 ### Canonical JSON output
 
-In addition to the human-readable `sast/<skill>-results.md`, each subagent must also emit a machine-readable `sast/<skill>-results.json` file so the `sast-skills export` CLI can aggregate `sast/*-results.json` into SARIF, JSON, or HTML.
+In addition to the human-readable `sast/<skill>-results.md`, each subagent must also emit a machine-readable `sast/<skill>-results.json` file so the `sast-skills export` CLI can aggregate `sast/*-results.json` into SARIF, JSON, HTML, or NIST OSCAL (`assessment-results` / POA&M).
 
 Each JSON file must contain a single object with a `findings` array. Each finding follows this canonical schema:
 

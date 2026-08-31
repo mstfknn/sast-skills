@@ -1,6 +1,6 @@
 {
   "name": "sast-skills",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "LLM SAST skills — turn your AI coding assistant into a SAST scanner for your codebase.",
   "type": "module",
   "bin": {
@@ -50,6 +50,8 @@
     "@clack/prompts": "^1.6.0"
   },
   "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "markdownlint-cli2": "^0.22.1",
     "tdd-guard-vitest": "^0.2.0",
     "vitest": "^4.1.9"

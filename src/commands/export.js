@@ -1,5 +1,6 @@
 import { readFile, writeFile, stat, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import { toOscalAssessmentResults, toOscalPoam } from '../oscal.js';
 
 async function packageVersion() {
   const pkgUrl = new URL('../../package.json', import.meta.url);
@@ -80,6 +81,14 @@ function toSarif(data) {
   };
 }
 
+const renderers = {
+  json: (data) => `${JSON.stringify(data)}\n`,
+  sarif: (data) => `${JSON.stringify(toSarif(data))}\n`,
+  html: (data) => toHtml(data),
+  oscal: (data) => `${JSON.stringify(toOscalAssessmentResults(data))}\n`,
+  'oscal-poam': (data) => `${JSON.stringify(toOscalPoam(data))}\n`,
+};
+
 export async function exportCmd({ argv, stdout }) {
   let input;
   let output;
@@ -90,6 +99,9 @@ export async function exportCmd({ argv, stdout }) {
     else if (argv[i] === '--output') output = argv[++i];
     else if (argv[i] === '--format') format = argv[++i];
     else if (argv[i] === '--triaged') triaged = true;
+  }
+  if (!Object.hasOwn(renderers, format)) {
+    throw new Error(`Unknown --format "${format}". Supported formats: ${Object.keys(renderers).join(', ')}.`);
   }
   const info = await stat(input);
   let data;
@@ -109,9 +121,7 @@ export async function exportCmd({ argv, stdout }) {
   } else {
     data = JSON.parse(await readFile(input, 'utf8'));
   }
-  const payload = format === 'html'
-    ? toHtml(data)
-    : `${JSON.stringify(format === 'sarif' ? toSarif(data) : data)}\n`;
+  const payload = renderers[format](data);
   if (output) {
     await writeFile(output, payload);
   } else {

@@ -46,20 +46,40 @@ function patchReadme(content, { name, description }) {
   return lines.join('\n');
 }
 
+function patchControls(content, { name }) {
+  const entry = `  '${name}': ['ra-5'],`;
+  const lines = content.split('\n');
+  if (lines.some((l) => l.trimStart().startsWith(`'${name}':`))) return content;
+
+  // Seed the fallback so the new skill is mapped from the moment it exists —
+  // oscal-controls.test.js fails on an unmapped skill. The author narrows
+  // 'ra-5' to the controls this vulnerability class actually defeats.
+  const open = lines.findIndex((l) => l.includes('SKILL_CONTROLS = {'));
+  if (open === -1) throw new Error('patchControls: SKILL_CONTROLS declaration not found.');
+  const close = lines.indexOf('};', open);
+  if (close === -1) throw new Error('patchControls: end of SKILL_CONTROLS not found.');
+
+  lines.splice(close, 0, entry);
+  return lines.join('\n');
+}
+
 export async function registerSkill({ repoRoot, name, resultsBasename, label, description }) {
   const claudePath = join(repoRoot, 'sast-files', 'CLAUDE.md');
   const agentsPath = join(repoRoot, 'sast-files', 'AGENTS.md');
   const readmePath = join(repoRoot, 'README.md');
+  const controlsPath = join(repoRoot, 'src', 'oscal-controls.js');
 
-  const [claude, agents, readme] = await Promise.all([
+  const [claude, agents, readme, controls] = await Promise.all([
     readFile(claudePath, 'utf8'),
     readFile(agentsPath, 'utf8'),
     readFile(readmePath, 'utf8'),
+    readFile(controlsPath, 'utf8'),
   ]);
 
   await writeFile(claudePath, patchOrchestrator(claude, { name, resultsBasename, label }));
   await writeFile(agentsPath, patchOrchestrator(agents, { name, resultsBasename, label }));
   await writeFile(readmePath, patchReadme(readme, { name, description }));
+  await writeFile(controlsPath, patchControls(controls, { name }));
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

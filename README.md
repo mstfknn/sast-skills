@@ -50,6 +50,7 @@ It runs all four phases and writes findings to `sast/`. Aggregate them with `npx
 - **Four-phase orchestration** — reconnaissance → parallel detection → consolidated report → evidence-based triage, driven entirely from `CLAUDE.md` / `AGENTS.md`.
 - **Idempotent & resumable** — each phase skips work whose output already exists; re-run after fixing issues to refresh only what's stale.
 - **Machine-readable output** — every skill emits canonical JSON; `sast-skills export` aggregates to JSON, **SARIF 2.1.0**, or HTML for GitHub Code Scanning and CI.
+- **Compliance-ready output** — the same findings export as **[NIST OSCAL](https://github.com/usnistgov/OSCAL) 1.2.3**: an `assessment-results` (SAR) document or a `plan-of-action-and-milestones` (POA&M), with every finding mapped to the NIST SP 800-53 Rev 5 controls it puts in doubt.
 - **Cross-assistant** — identical skills ship for Claude Code (`.claude/skills`) and every `AGENTS.md` assistant (`.agents/skills`).
 - **Zero-config CLI** — `install` / `update` / `uninstall` / `doctor` / `export`, published from GitHub Actions with npm provenance (SLSA attestation).
 
@@ -66,8 +67,9 @@ flowchart TD
     S1 -->|sast/architecture.md| S2["Step 2 — parallel vulnerability scan<br/>64 skills: recon, batched verify, merge"]
     S2 -->|sast/*-results.md and *-results.json| S3["Step 3 — sast-report<br/>consolidate and rank"]
     S3 -->|sast/final-report.md| S4["Step 4 — sast-triage<br/>false-positive elimination,<br/>severity adjustment with evidence"]
-    S4 -->|sast/final-report-triaged.md and triaged.json| EXP["npx sast-skills export<br/>JSON, SARIF, HTML"]
+    S4 -->|sast/final-report-triaged.md and triaged.json| EXP["npx sast-skills export<br/>JSON, SARIF, HTML, OSCAL"]
     EXP --> CS(["GitHub Code Scanning, CI, dashboards"])
+    EXP --> GRC(["OSCAL SAR / POA&M for GRC"])
 ```
 
 Every step is **idempotent**: if its output file already exists, the orchestrator skips it. Re-run the scan after fixing issues to refresh only what's stale.
@@ -304,6 +306,8 @@ If you keep the clone around, `cd "$SAST_SRC" && git pull && <rerun cp>` is the 
 | `npx sast-skills uninstall` | Remove installed skills; refuses to drop a modified `CLAUDE.md` without `--force` |
 | `npx sast-skills doctor` | Verify an install and report `OK` / `MISSING` / `MODIFIED` per file; exits non-zero on issues |
 | `npx sast-skills export --input sast/ --format sarif --output report.sarif` | Aggregate `sast/*-results.json` into JSON, SARIF 2.1.0, or HTML |
+| `npx sast-skills export --input sast/ --format oscal --output sar.json` | Emit a NIST OSCAL 1.2.3 `assessment-results` document |
+| `npx sast-skills export --input sast/ --format oscal-poam --output poam.json` | Emit a NIST OSCAL 1.2.3 `plan-of-action-and-milestones` |
 | `npx sast-skills export --input sast/ --triaged --format sarif` | Prefer the triaged `sast/triaged.json` over raw per-skill results |
 | `npx sast-skills --version` | Print the installed CLI version |
 
@@ -367,6 +371,8 @@ Each skill writes `sast/<skill>-results.json` as a bare findings list:
 
 Triaged findings add `triage_status` (`confirmed|upgraded|downgraded|false_positive`), `triage_original_severity` (when severity changed), and `triage_evidence` with concrete codebase citations.
 
+Every field above is carried through to the OSCAL export — see [NIST OSCAL](#nist-oscal-compliance-evidence) for the field-by-field mapping.
+
 ---
 
 ## 🔌 CI integrations
@@ -383,6 +389,36 @@ Composite action at `.github/actions/scan/action.yml`:
 ```
 
 This runs `sast-skills export --format sarif` and uploads the result to Code Scanning via `github/codeql-action/upload-sarif@v3`.
+
+### NIST OSCAL (compliance evidence)
+
+For GRC platforms, audit evidence, and control-baseline reporting, export the same findings as [OSCAL](https://github.com/usnistgov/OSCAL) — the NIST Open Security Controls Assessment Language. Documents declare `oscal-version` **1.2.3** and validate against the published NIST JSON schemas in CI.
+
+```bash
+# Security Assessment Results (SAR) — a point-in-time record of what was found
+npx sast-skills export --input sast/ --triaged --format oscal --output sast-skills-sar.json
+
+# Plan of Action and Milestones (POA&M) — the remediation backlog
+npx sast-skills export --input sast/ --triaged --format oscal-poam --output sast-skills-poam.json
+```
+
+**How a finding maps.** OSCAL separates evidence from risk from compliance verdict, so each sast-skills finding fans out into three linked objects:
+
+| sast-skills | OSCAL | Notes |
+|---|---|---|
+| `title`, `description`, `location` | `observation` | `methods: ["TEST"]`, evidence href `path/to/file.js#L42` |
+| `severity` | `risk.characterizations[].facets[]` | facet `severity` |
+| `exploitability` | facet `likelihood` | omitted when the finding does not carry it |
+| `confidence` | facet `confidence` | omitted when the finding does not carry it |
+| `remediation` | `risk.remediations[]` | `lifecycle: "recommendation"` |
+| `chain_id`, `skill`, `triage_status` | `risk.props[]` | fields OSCAL has no first-class slot for |
+| `skill` → controls | `finding.target` | `statement-id` `si-10_smt`, status `not-satisfied` |
+
+**Control mapping.** Every detection skill maps to the NIST SP 800-53 Rev 5 controls whose objective its findings put in doubt — `sast-sqli` → `si-10`, `sast-crypto` → `sc-13`/`sc-28`, `sast-missingauth` → `ac-3`/`ac-6`/`ia-2`, and so on. Those ids populate `reviewed-controls` and each finding's `target-id`. The full table lives in [`src/oscal-controls.js`](src/oscal-controls.js); an unmapped skill falls back to `ra-5` (Vulnerability Monitoring and Scanning) rather than being dropped.
+
+**Triage semantics differ by model.** In the SAR, a finding triaged as a false positive stays in the document as a **closed** risk — evidence that the scanner considered and dispositioned it. In the POA&M it is **omitted entirely**, because a POA&M is a list of work still owed.
+
+**Stable identifiers.** All UUIDs are RFC 4122 v5, derived from the finding's own content (skill, file, line, title). Re-exporting an unchanged `sast/` directory produces a byte-identical document apart from the run timestamps, so OSCAL output is safe to commit and diff across scans.
 
 ### Pre-commit hook
 
