@@ -52,9 +52,9 @@
   "devDependencies": {
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "markdownlint-cli2": "^0.22.1",
+    "markdownlint-cli2": "^0.23.2",
     "tdd-guard-vitest": "^0.2.0",
-    "vitest": "^4.1.9"
+    "vitest": "^5.0.0"
   },
   "overrides": {
     "@anthropic-ai/sdk": "0.91.1",
